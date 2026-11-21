@@ -1,0 +1,60 @@
+.st-app { margin: 0; line-height: 1.5; }
+.st-app .container { width: 100%; padding-inline: 24px; }
+.st-app .page-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+.st-app .page-head h1 { margin: 0; }
+.st-app .small { font-size: 12px; }
+.st-app .muted { color: #53686b; }
+.st-app .footer { border-top: 1px solid #dce6e3; padding-top: 12px; color: #53686b; font-size: 12px; }
+
+.st-app .btn {
+    display: inline-block;
+    padding: 7px 14px;
+    border: 1px solid #dce6e3;
+    border-radius: 8px;
+    background: #fff;
+    color: #172c35;
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.st-app .btn-sm { padding: 4px 10px; font-size: 12px; }
+.st-app .btn-primary { background: #08756d; color: #fff; }
+.st-app .btn-danger { background: #fff7f5; color: #9c352a; }
+
+.st-app .card, .st-app .form-grid, .st-app .table-wrap { border: 1px solid #dce6e3; border-radius: 8px; background: #fff; }
+.st-app .card, .st-app .form-grid { padding: 20px; }
+.st-app .form-grid fieldset { min-width: 0; margin: 0 0 16px; border: 1px solid #dce6e3; border-radius: 6px; }
+.st-app .form-grid legend { padding-inline: 6px; font-weight: 650; font-size: 14px; }
+.st-app .form-grid label { display: block; margin-bottom: 12px; font-size: 14px; }
+.st-app .form-grid input:not([type=checkbox]), .st-app .form-grid select, .st-app .form-grid textarea {
+    width: 100%;
+    margin-top: 4px;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 14px;
+}
+.st-app .row-2, .st-app .row-3 { display: grid; gap: 12px; }
+.st-app .row-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.st-app .row-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.st-app .form-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+
+.st-app .table-wrap { overflow-x: auto; }
+.st-app .table { width: 100%; border-collapse: collapse; }
+.st-app .table th, .st-app .table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #e8eeeb; vertical-align: top; }
+.st-app .table th { background: #edf5f0; font-size: 13px; font-weight: 650; }
+.st-app .alert { margin-block: 12px; padding: 12px 15px; border-radius: 8px; }
+.st-app .alert-error { border: 1px solid #e5c3bd; background: #fff0ed; color: #9c352a; }
+
+@media (max-width: 600px) {
+    .st-app .container { padding-inline: 14px; }
+    .st-app .row-2, .st-app .row-3 { grid-template-columns: minmax(0, 1fr); }
+}
+@media print {
+    .st-app .container { padding-inline: 0; }
+    .st-app .table-wrap { overflow: visible; }
+}

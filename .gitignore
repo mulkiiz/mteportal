@@ -1,0 +1,13 @@
+/*
+!/.gitignore
+!/README.md
+!/mte/
+/mte/seed_nov2026.php
+/mte/st_files/
+/mte/unggah/*
+!/mte/unggah/.htaccess
+
+*.env
+*.local.php
+*.bak
+*.log

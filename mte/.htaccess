@@ -1,0 +1,35 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(kelola_st|simulasi)\.php$ index.php [L]
+    RewriteRule ^(kelola-st|simulasi-akreditasi)(/index\.php)?/?$ index.php [L]
+    RewriteRule ^masuk/?$ index.php?route=masuk [QSA,L]
+    RewriteRule ^admin/?$ index.php?route=admin [QSA,L]
+    RewriteRule ^berita/halaman/([1-9][0-9]*)/?$ index.php?bagian=berita&halaman=$1 [QSA,L]
+    RewriteRule ^berita/tipe/(berita|pengumuman|agenda)/halaman/([1-9][0-9]*)/?$ index.php?bagian=berita&tipe=$1&halaman=$2 [QSA,L]
+    RewriteRule ^berita/tipe/(berita|pengumuman|agenda)/([a-z0-9-]+)/halaman/([1-9][0-9]*)/?$ index.php?bagian=berita&tipe=$1&id=$2&halaman=$3 [QSA,L]
+    RewriteRule ^berita/tipe/(berita|pengumuman|agenda)/([a-z0-9-]+)/?$ index.php?bagian=berita&tipe=$1&id=$2 [QSA,L]
+    RewriteRule ^berita/tipe/(berita|pengumuman|agenda)/?$ index.php?bagian=berita&tipe=$1 [QSA,L]
+    RewriteRule ^berita/([a-z0-9-]+)/halaman/([1-9][0-9]*)/?$ index.php?bagian=berita&id=$1&halaman=$2 [QSA,L,NC]
+    RewriteRule ^berita/([a-z0-9-]+)/?$ index.php?bagian=berita&id=$1 [QSA,L,NC]
+    RewriteRule ^berita/?$ index.php?bagian=berita [QSA,L]
+    RewriteRule ^dokumen/halaman/([1-9][0-9]*)/?$ index.php?bagian=dokumen&halaman=$1 [QSA,L,NC]
+    RewriteRule ^dokumen/([a-z0-9-]+)/halaman/([1-9][0-9]*)/?$ index.php?bagian=dokumen&id=$1&halaman=$2 [QSA,L,NC]
+    RewriteRule ^dokumen/([a-z0-9-]+)/?$ index.php?bagian=dokumen&id=$1 [QSA,L,NC]
+    RewriteRule ^(vmts|cpl|ppm|kurikulum|dokumen|peminatan)/?$ index.php?bagian=$1 [QSA,L,NC]
+</IfModule>
+
+<FilesMatch "^(seed_nov2026|st_lib|install)\.php$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^(db|portal_lib|admin_page|masuk_page|install_portal)\.php$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "\.(sql|md|json|log)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(?i)(^\.|~$|\.(bak|old|orig|save|swp|dist|ini|env|log|sql|md|json|ya?ml|toml|inc|phps)$)">
+    Require all denied
+</FilesMatch>

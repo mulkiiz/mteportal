@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Kolaborasi laboratorium</title><desc id="desc">Ilustrasi kolaborasi riset energi dan laboratorium teknik elektro.</desc>
+  <defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#cce9df"/><stop offset="1" stop-color="#6a9b91"/></linearGradient><linearGradient id="panel" x2="1" y2="1"><stop stop-color="#285b72"/><stop offset="1" stop-color="#163846"/></linearGradient></defs>
+  <rect width="1200" height="720" fill="url(#bg)"/><circle cx="960" cy="145" r="68" fill="#f6d981"/><path d="M0 420q185-126 390-8t410-6q200-87 400-2v316H0z" fill="#8ab0a2"/><path d="M0 486q220-108 420 0t408-8q203-79 372-10v252H0z" fill="#4d7a73"/>
+  <path d="M172 454l45-153 45 153zM710 439l40-134 40 134z" fill="#edf3e9"/><path d="M217 301V199M750 304V189" stroke="#edf3e9" stroke-width="13"/><circle cx="217" cy="195" r="14" fill="#f6d981"/><circle cx="750" cy="185" r="14" fill="#f6d981"/><path d="M217 199l-74-34m74 34 65-51m-65 51-10 91M750 189l-67-31m67 31 65-49m-65 49-9 115" stroke="#edf3e9" stroke-width="9" stroke-linecap="round"/>
+  <g transform="translate(344 432) skewX(-17)"><rect width="360" height="132" rx="12" fill="url(#panel)"/><path d="M20 45h320M20 88h320M90 10v112M180 10v112M270 10v112" stroke="#76b8c0" stroke-width="5" opacity=".8"/><path d="M0 139h388" stroke="#e6ebe4" stroke-width="13"/></g>
+  <rect x="64" y="580" width="1072" height="140" fill="#17414a" opacity=".95"/><text x="104" y="652" fill="#fff" font-family="Arial,sans-serif" font-size="38" font-weight="700">KOLABORASI LABORATORIUM</text><text x="1060" y="652" text-anchor="end" fill="#bfe5d8" font-family="Arial,sans-serif" font-size="23">DOKUMENTASI KEGIATAN</text>
+</svg>
