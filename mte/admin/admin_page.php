@@ -192,7 +192,7 @@ $checkedActive = array_key_exists('is_active', $formData)
     <meta name="color-scheme" content="light">
     <title>Dashboard Pengelola · MTE UNSOED</title>
     <link rel="icon" type="image/svg+xml" href="<?= mteEscape($assetPath) ?>/unsoed-favicon.svg?v=1">
-    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/portal-admin.css?v=14">
+    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/portal-admin.css?v=15">
     <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/portal-brand.css?v=2">
 </head>
 <body class="admin-page">
@@ -274,7 +274,7 @@ $checkedActive = array_key_exists('is_active', $formData)
                     </section>
                 <?php elseif ($showEditor): ?>
                     <?php $isEditing = $editItem !== null; ?>
-                    <form class="admin-form" method="post" enctype="multipart/form-data" action="<?= mte_portal_escape($basePathAdmin) ?>/admin/">
+                    <form class="admin-form<?= $adminMenu === 'berita' ? ' admin-form-wide' : '' ?>" method="post" enctype="multipart/form-data" action="<?= mte_portal_escape($basePathAdmin) ?>/admin/">
                         <input type="hidden" name="csrf_token" value="<?= mte_portal_escape($csrfAdmin) ?>">
                         <input type="hidden" name="action" value="simpan">
                         <input type="hidden" name="section" value="<?= mte_portal_escape($adminMenu) ?>">

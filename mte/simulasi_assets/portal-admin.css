@@ -139,6 +139,7 @@
 @media(max-width:600px){.tiptap-toolbar{gap:4px;padding:6px 5px}.tiptap-tool-group{gap:1px}.tiptap-tool-separator{margin:0 1px}.tiptap-tool{width:31px;height:32px}.tiptap-heading{width:32px}.tiptap-editor{min-height:220px;padding:12px;font-size:12px}.tiptap-content{min-height:195px}}
 @media(hover:none){.tiptap-content [data-resize-handle]{opacity:1;pointer-events:auto}}
 .admin-form{width:100%;min-width:0;grid-template-columns:minmax(0,1fr)}
+.admin-form-wide{max-width:none}
 .admin-form>*{min-width:0;max-width:100%}
 .admin-form>label,.admin-form-grid>*{min-width:0;width:100%}
 .admin-rich-field,.rich-editor-frame,.tiptap-toolbar,.tiptap-editor,.tiptap-content{min-width:0;max-width:100%}
