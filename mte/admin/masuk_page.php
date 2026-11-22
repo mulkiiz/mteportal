@@ -50,7 +50,8 @@ $csrfLogin = mte_portal_csrf_token();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <title>Masuk Admin · MTE UNSOED</title>
-    <link rel="stylesheet" href="<?= mte_portal_escape($basePathLogin) ?>/simulasi_assets/portal-admin.css?v=2">
+    <link rel="icon" type="image/svg+xml" href="<?= mte_portal_escape($basePathLogin) ?>/simulasi_assets/unsoed-favicon.svg?v=1">
+    <link rel="stylesheet" href="<?= mte_portal_escape($basePathLogin) ?>/simulasi_assets/portal-admin.css?v=3">
 </head>
 <body class="login-page">
     <main class="login-backdrop">

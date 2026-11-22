@@ -6,7 +6,7 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 
-require_once __DIR__ . '/portal_lib.php';
+require_once __DIR__ . '/../includes/portal_lib.php';
 
 try {
     $result = mte_portal_install();

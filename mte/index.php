@@ -17,14 +17,14 @@ $routePath = is_string($requestPath) ? rtrim($requestPath, '/') : '';
 $adminTools = ['kelola-st' => 'kelola_st.php', 'simulasi-akreditasi' => 'simulasi.php'];
 if ($routePath === $basePath . '/masuk') {
     define('MTE_PORTAL_ROUTED', true);
-    require_once __DIR__ . '/portal_lib.php';
-    require __DIR__ . '/masuk_page.php';
+    require_once __DIR__ . '/includes/portal_lib.php';
+    require __DIR__ . '/admin/masuk_page.php';
     exit;
 }
 if ($routePath === $basePath . '/admin') {
     define('MTE_PORTAL_ROUTED', true);
-    require_once __DIR__ . '/portal_lib.php';
-    require __DIR__ . '/admin_page.php';
+    require_once __DIR__ . '/includes/portal_lib.php';
+    require __DIR__ . '/admin/admin_page.php';
     exit;
 }
 foreach ($adminTools as $tool => $legacyFile) {
@@ -36,7 +36,7 @@ foreach ($adminTools as $tool => $legacyFile) {
     }
     if ($routePath === $toolPath) {
         define('MTE_PORTAL_ROUTED', true);
-        require_once __DIR__ . '/portal_lib.php';
+        require_once __DIR__ . '/includes/portal_lib.php';
         $adminUser = mte_portal_require_admin($tool);
         require __DIR__ . '/' . $tool . '/index.php';
         exit;
@@ -122,7 +122,7 @@ $peminatan = [
 ];
 
 try {
-    require_once __DIR__ . '/portal_lib.php';
+    require_once __DIR__ . '/includes/portal_lib.php';
     $kontenDariDatabase = mte_portal_public_content();
     $vmts = $cpl = $ppm = $kurikulum = $berita = $dokumen = $peminatan = [];
     foreach ($kontenDariDatabase as $row) {
@@ -203,7 +203,7 @@ function mteAdminBrand(string $subtitle): void
 
 function mteIcon(string $assetPath, string $name): void
 {
-    $iconHref = mteEscape($assetPath . '/portal-icons.svg?v=1#' . rawurlencode($name));
+    $iconHref = mteEscape($assetPath . '/portal-icons.svg?v=2#' . rawurlencode($name));
     ?>
     <svg class="ui-icon" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="<?= $iconHref ?>"/></svg>
     <?php
@@ -217,7 +217,10 @@ function mteEncodePath(string $path): string
 function mteBodyHtml(string $html): string
 {
     if (function_exists('mte_portal_sanitize_html')) {
-        return mte_portal_sanitize_html($html);
+        $safeHtml = mte_portal_sanitize_html($html);
+        return function_exists('mte_portal_keep_hyphenated_words_together')
+            ? mte_portal_keep_hyphenated_words_together($safeHtml)
+            : $safeHtml;
     }
     return '<p>' . nl2br(mteEscape($html), false) . '</p>';
 }
@@ -357,18 +360,19 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
     <meta name="color-scheme" content="light">
     <meta name="description" content="Informasi akademik, capaian pembelajaran, profil profesional mandiri, dan berita Program Studi Magister Teknik Elektro Unsoed.">
     <title><?= mteEscape($bagian[$aktif][1]) ?> · MTE UNSOED</title>
-    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/simulasi.css?v=1">
+    <link rel="icon" type="image/svg+xml" href="<?= mteEscape($assetPath) ?>/unsoed-favicon.svg?v=1">
+    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/simulasi.css?v=2">
     <style>
         .ui-icon { display: block; flex: none; }
-        .brand-mark { background: linear-gradient(145deg, #157d73, #075651); box-shadow: 0 3px 8px #0e5c5024; text-decoration: none; }
+        .brand-mark { background: linear-gradient(145deg, #3b82f6, #1d4ed8); box-shadow: 0 3px 8px #1d4ed833; text-decoration: none; }
         .brand-mark:hover { text-decoration: none; }
         .brand > div > span { font-size: 10px; letter-spacing: .3px; }
         .header-tools { gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
         .header-tools a { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; white-space: nowrap; }
         .header-tools a .ui-icon { width: 15px; height: 15px; color: var(--teal); }
         .header-tools a + a { padding-left: 14px; border-left: 1px solid var(--line); }
-        .hero { margin-top: 24px; padding: clamp(24px, 4vw, 48px); border: 1px solid #d5e5de; border-radius: 20px; background: radial-gradient(ellipse at 100% 0%, #d5eae2 0%, transparent 60%), #f3f8f5; }
-        .vision-index { display: block; max-width: 410px; justify-self: end; border: 1px solid #d5e5de; border-radius: 12px; padding: 17px 20px; background: #ffffffc9; }
+        .hero { margin-top: 24px; padding: clamp(24px, 4vw, 48px); border: 1px solid #d7e3f5; border-radius: 20px; background: radial-gradient(ellipse at 100% 0%, #dbe8ff 0%, transparent 60%), #f3f7ff; }
+        .vision-index { display: block; max-width: 410px; justify-self: end; border: 1px solid #d7e3f5; border-radius: 12px; padding: 17px 20px; background: #ffffffc9; }
         .vision-index .mini-label { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
         .vision-index .mini-label .ui-icon { width: 15px; height: 15px; }
         .vision-index blockquote { margin: 0; color: var(--ink); font-size: 12px; line-height: 1.75; }
@@ -378,24 +382,24 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
         .tabs a[aria-current="page"] { border-color: var(--teal); color: var(--teal); }
         .tab-panel { min-height: 285px; }
         .section-heading { justify-content: flex-start; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
-        .section-icon { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border: 1px solid #cce3d9; border-radius: 13px; background: #e7f3ed; color: var(--teal); }
+        .section-icon { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border: 1px solid #d0dffc; border-radius: 13px; background: #eaf1ff; color: var(--teal); }
         .section-icon .ui-icon { width: 23px; height: 23px; }
         .section-heading h1, .section-heading h2 { font-size: 30px; letter-spacing: -.9px; }
         .section-heading h1 { font-size: clamp(35px, 4vw, 53px); line-height: 1.1; letter-spacing: -2px; }
         .portal-layout { display: grid; grid-template-columns: 228px minmax(0, 1fr); gap: 24px; align-items: start; }
         .portal-outline { position: sticky; top: 86px; display: grid; gap: 3px; padding: 11px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
         .portal-outline > a { display: flex; align-items: flex-start; gap: 9px; padding: 8px; border: 1px solid transparent; border-radius: 8px; color: var(--ink); font-size: 12px; line-height: 1.45; }
-        .portal-outline > a:hover, .portal-outline > a:focus-visible { border-color: #c6dbd5; background: #f0f7f4; text-decoration: none; }
+        .portal-outline > a:hover, .portal-outline > a:focus-visible { border-color: #cedcf3; background: #f4f7ff; text-decoration: none; }
         .portal-outline > a strong, .portal-outline > a small { display: block; }
         .portal-outline > a strong { font-size: 12px; }
         .portal-outline > a small { margin-top: 3px; color: #53686b; font-size: 11px; }
-        .portal-outline > a[aria-current="page"] { border-color: #bbd9cd; background: #e8f4ee; }
+        .portal-outline > a[aria-current="page"] { border-color: #c4d3f0; background: #eaf1ff; }
         .portal-outline > a[aria-current="page"] strong { color: var(--teal); }
         .portal-outline .outline-section { display: block; margin: 5px 8px 4px; color: #53686b; }
         .portal-outline .department-menu-label { margin-top: 9px; padding-top: 10px; border-top: 1px solid var(--line); }
-        .menu-icon { display: grid; width: 29px; height: 29px; flex: 0 0 29px; place-items: center; border-radius: 7px; background: #edf5f1; color: var(--teal); }
+        .menu-icon { display: grid; width: 29px; height: 29px; flex: 0 0 29px; place-items: center; border-radius: 7px; background: #edf3ff; color: var(--teal); }
         .menu-icon .ui-icon { width: 16px; height: 16px; }
-        [aria-current="page"] > .menu-icon { background: #0c7066; color: #fff; }
+        [aria-current="page"] > .menu-icon { background: #2563eb; color: #fff; }
         .menu-external { margin: 4px 0 0 auto; color: #53686b; }
         .menu-external .ui-icon { width: 12px; height: 12px; }
         .portal-content { min-width: 0; }
@@ -410,19 +414,22 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
         .outcome-code { align-self: start; padding: 5px 7px; border-radius: 5px; background: var(--teal-light); color: var(--teal); font-size: 10px; font-weight: 750; text-align: center; }
         .outcome h3 { margin: 0 0 5px; font-size: 14px; }
         .outcome p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
-        .curriculum-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); align-items: stretch; gap: 15px; }
-        .curriculum-semester { overflow: hidden; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
-        .curriculum-semester-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 19px; border-bottom: 1px solid var(--line); background: #f6f8fa; }
-        .curriculum-semester-head h3 { margin: 0; color: var(--ink); font-size: 16px; }
-        .curriculum-sks-total { padding: 5px 10px; border-radius: 999px; background: #fff; color: #1c4a8a; font-size: 11px; font-weight: 750; white-space: nowrap; }
-        .curriculum-course { padding: 12px 17px 13px; border-bottom: 1px solid var(--line); }
-        .curriculum-course:last-child { border-bottom: 0; }
-        .curriculum-course-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 7px; }
-        .curriculum-course-code { padding: 4px 7px; border-radius: 5px; background: #f0f2f5; color: #647182; font-size: 10px; }
-        .curriculum-course-kind { padding: 3px 10px; border: 1px solid #c6d8ff; border-radius: 999px; background: #f2f6ff; color: #2454b5; font-size: 10px; font-weight: 700; }
-        .curriculum-course h4 { margin: 0 0 7px; color: var(--ink); font-size: 13px; font-weight: 650; }
-        .curriculum-course p { margin: 0; color: #234b85; font-size: 11px; }
-        .rich-content { color: var(--muted); font-size: 12px; line-height: 1.8; overflow-wrap: anywhere; }
+        .curriculum-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 14px; }
+        .curriculum-list > .empty-state { grid-column: 1 / -1; }
+        .curriculum-semester { overflow: hidden; border: 1px solid #d7e2f3; border-radius: 11px; background: #fff; box-shadow: 0 3px 12px #163b430a; }
+        .curriculum-semester-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 12px; background: linear-gradient(105deg, #3575d2, #2d67c4); color: #fff; }
+        .curriculum-semester-head h3 { margin: 0; color: inherit; font-size: 15px; }
+        .curriculum-sks-total { padding: 3px 8px; border: 1px solid #ffffff55; border-radius: 999px; background: #ffffff1f; color: inherit; font-size: 11px; font-weight: 750; white-space: nowrap; }
+        .curriculum-courses { margin: 0; padding: 0; list-style: none; }
+        .curriculum-course { display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px; align-items: center; gap: 8px; min-height: 38px; padding: 8px 10px; line-height: 1.4; }
+        .curriculum-course + .curriculum-course { border-top: 1px solid #e6ebf5; }
+        .curriculum-course:nth-child(even) { background: #f6f9ff; }
+        .curriculum-course:hover { background: #eff5ff; }
+        .curriculum-course-code { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .curriculum-course h4 { margin: 0; color: var(--ink); font-size: 12px; font-weight: 650; overflow-wrap: anywhere; }
+        .curriculum-course-code { color: #4b6269; font: 600 10px/1.35 Consolas, "Courier New", monospace; }
+        .curriculum-course-sks { padding-left: 6px; border-left: 1px solid #d5e0f3; color: var(--ink); font-size: 11px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+        .rich-content { color: var(--muted); font-size: 12px; line-height: 1.8; overflow-wrap: break-word; word-break: normal; hyphens: none; }
         .rich-content p { margin: 0 0 10px; color: inherit; font: inherit; line-height: inherit; }
         .rich-content p:last-child { margin-bottom: 0; }
         .rich-content ul, .rich-content ol { margin: 8px 0; padding-left: 22px; }
@@ -431,16 +438,17 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
         .rich-content table { width: 100%; min-width: 440px; border-collapse: collapse; color: var(--ink); font-size: 11px; }
         .rich-content th, .rich-content td { padding: 8px 9px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
         .rich-content th { background: #f5f7f9; color: var(--ink); font-size: 10px; }
+        .idea-grid > .document-card .rich-content th { background: linear-gradient(105deg, #3575d2, #2d67c4); color: #fff; }
         .rich-content th:last-child, .rich-content td:last-child { width: 62px; text-align: center; white-space: nowrap; }
         .rich-content a { color: var(--teal); text-decoration: underline; }
         .rich-content img { display: block; max-width: 100%; height: auto; margin: 12px 0; border-radius: 8px; }
-        .rich-content blockquote { margin: 12px 0; padding: 8px 14px; border-left: 3px solid #83b3a5; color: var(--ink); background: #f4f8f5; }
+        .rich-content blockquote { margin: 12px 0; padding: 8px 14px; border-left: 3px solid #8fb1f2; color: var(--ink); background: #f4f7ff; }
         .news-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); align-items: stretch; gap: 11px; }
         .news-filters { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 15px; }
         .news-filters a { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: white; color: var(--muted); font-size: 11px; font-weight: 650; }
         .news-filters a:hover { border-color: var(--teal); color: var(--teal); text-decoration: none; }
         .news-filters a[aria-current="page"] { border-color: var(--teal); background: var(--teal); color: white; }
-        .news-type-tag { display: inline-flex; width: fit-content; align-items: center; padding: 5px 9px; border-radius: 999px; background: #e8f0ed; color: var(--teal); font-size: 9px; font-weight: 750; letter-spacing: .4px; text-transform: uppercase; }
+        .news-type-tag { display: inline-flex; width: fit-content; align-items: center; padding: 5px 9px; border-radius: 999px; background: #eaf1ff; color: var(--teal); font-size: 9px; font-weight: 750; letter-spacing: .4px; text-transform: uppercase; }
         .news-type-pengumuman { background: #f4f1e8; color: #80683b; }
         .news-type-agenda { background: #eaf0f8; color: #476689; }
         .news-card { margin: 0; padding: 20px 22px; }
@@ -459,6 +467,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
         .pager-disabled { color: #9aa7a5; }
         .detail-back { margin-bottom: 18px; }
         .detail-article { max-width: 760px; padding: 28px; }
+        .news-detail-article { width: 100%; max-width: none; min-width: 0; }
         .detail-article h3 { margin: 9px 0 12px; font-size: 24px; }
         .detail-article p { color: var(--muted); font-size: 14px; line-height: 1.9; }
         .detail-article .news-date { margin: 0 0 14px; font-size: 11px; }
@@ -491,7 +500,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
         .news-read .ui-icon, .document-actions > a:first-child .ui-icon { width: 14px; height: 14px; }
         .document-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
         .document-actions > a:first-child { font-size: 11px; font-weight: 650; }
-        .document-actions .download-icon { display: inline-flex; flex: 0 0 40px; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: #e8f0ed; color: var(--teal); line-height: 0; }
+        .document-actions .download-icon { display: inline-flex; flex: 0 0 40px; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 9px; background: #eaf1ff; color: var(--teal); line-height: 0; }
         .document-actions .download-icon svg { display: block; flex: 0 0 auto; width: 18px; height: 18px; }
         .download-icon:hover { border-color: var(--teal); background: var(--teal); color: white; text-decoration: none; }
         .document-meta { display: flex; flex-wrap: wrap; gap: 7px 12px; margin: 0 0 15px; padding: 12px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); font-size: 11px; }
@@ -503,10 +512,22 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
         }
         .idea-card:hover, .outcome:hover, .news-card:hover, .detail-article:hover, .document-card:hover, .portal-outline > a:hover {
             transform: translateY(-3px);
-            border-color: #a6c9c0;
+            border-color: #b2c6ef;
             box-shadow: var(--shadow);
         }
         .page-footer { margin-top: 18px; }
+        @media (min-width: 1160px) {
+            .curriculum-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+            .curriculum-semester-head { padding-inline: 12px; }
+            .curriculum-course {
+                grid-template-columns: 54px minmax(0, 1fr) 42px;
+                gap: 7px;
+                min-height: 38px;
+                padding: 7px 9px;
+            }
+            .curriculum-course h4 { font-size: 12px; letter-spacing: -.1px; }
+            .curriculum-course-code, .curriculum-course-sks { font-size: 10px; }
+        }
         @media (max-width: 800px) {
             .portal-layout { grid-template-columns: minmax(0, 1fr); gap: 17px; }
             .portal-outline { position: static; grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); gap: 6px; }
@@ -530,6 +551,9 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
             .section-heading h1, .section-heading h2 { font-size: 24px; }
             .section-heading p { font-size: 11px; }
             .idea-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+            .curriculum-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+            .curriculum-course { grid-template-columns: 64px minmax(0, 1fr) 44px; gap: 8px; padding-inline: 9px; }
+            .curriculum-course h4 { font-size: 12px; }
             .idea-card { padding: 18px; }
             .outcome { grid-template-columns: 52px minmax(0, 1fr); gap: 11px; padding: 15px 12px; }
             .news-card { padding: 17px; }
@@ -584,7 +608,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                     <?php elseif ($aktif === 'ppm'): ?>
                         <p>Ruang untuk profil profesional lulusan setelah memasuki dunia kerja.</p>
                     <?php elseif ($aktif === 'kurikulum'): ?>
-                        <p>Daftar mata kuliah per semester beserta kelompok dan beban SKS.</p>
+                        <p>Daftar mata kuliah per semester beserta kode dan beban SKS.</p>
                     <?php elseif ($aktif === 'dokumen'): ?>
                         <p><?= $dokumenDetail !== null ? 'Rincian dokumen dan berkas unduh program studi.' : 'Daftar dokumen program studi, lengkap dengan akses unduh langsung dan halaman detail.' ?></p>
                     <?php elseif ($aktif === 'peminatan'): ?>
@@ -645,16 +669,15 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                                         <h3 id="semester-<?= (int) $semester ?>">Semester <?= (int) $semester ?></h3>
                                         <span class="curriculum-sks-total"><?= (int) $totalSksSemester ?> SKS</span>
                                     </header>
-                                    <?php foreach ($mataKuliahSemester as $mataKuliah): ?>
-                                        <article class="curriculum-course">
-                                            <div class="curriculum-course-top">
-                                                <span class="curriculum-course-code"><?= mteEscape($mataKuliah['kode']) ?></span>
-                                                <span class="curriculum-course-kind"><?= mteEscape($mataKuliah['kelompok']) ?></span>
-                                            </div>
-                                            <h4><?= mteEscape($mataKuliah['judul']) ?></h4>
-                                            <p><?= (int) $mataKuliah['sks'] ?> SKS</p>
-                                        </article>
-                                    <?php endforeach; ?>
+                                    <ul class="curriculum-courses" role="list">
+                                        <?php foreach ($mataKuliahSemester as $mataKuliah): ?>
+                                            <li class="curriculum-course">
+                                                <code class="curriculum-course-code" title="<?= mteEscape($mataKuliah['kode']) ?>"><?= mteEscape($mataKuliah['kode']) ?></code>
+                                                <h4 title="<?= mteEscape($mataKuliah['judul']) ?>"><?= mteEscape($mataKuliah['judul']) ?></h4>
+                                                <span class="curriculum-course-sks"><?= (int) $mataKuliah['sks'] ?> SKS</span>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
                                 </section>
                             <?php endforeach; ?>
                         </div>
@@ -727,7 +750,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                         <?php if ($beritaDetail !== null): ?>
                             <?php $galeriBeritaTampil = !empty($beritaDetail['galeri_managed']) ? ($beritaDetail['galeri'] ?? []) : ($beritaDetail['id'] === 'seminar-riset' ? $galeriSeminar : []); ?>
                             <a class="button detail-back" href="<?= mteUrlBerita($basePath, $tipeAktif, $halaman) ?>">Kembali ke daftar berita</a>
-                            <article class="method-card detail-article">
+                            <article class="method-card detail-article news-detail-article">
                                 <span class="news-type-tag news-type-<?= mteEscape($beritaDetail['jenis']) ?>"><?= mteEscape($tipeBerita[$beritaDetail['jenis']]) ?></span>
                                 <h3><?= mteEscape($beritaDetail['judul']) ?></h3>
                                 <?php mteNewsDate($beritaDetail['tanggal']); ?>
@@ -825,7 +848,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
         </section>
 
         <footer class="page-footer">
-            <span>MTE · Portal Program Studi</span>
+            <span>© 2026 Jurusan Teknik Elektro UNSOED. Seluruh hak cipta dilindungi.</span>
             <span>Fakultas Teknik · Universitas Jenderal Soedirman</span>
         </footer>
     </main>

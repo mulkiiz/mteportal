@@ -1,6 +1,6 @@
 <?php
 // Kelola ST memakai koneksi database portal MTE.
-require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/../includes/db.php';
 
 function mte_st_escape($value): string
 {

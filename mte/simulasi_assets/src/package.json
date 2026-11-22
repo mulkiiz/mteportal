@@ -1,0 +1,14 @@
+{
+  "name": "mte-portal-news-editor",
+  "private": true,
+  "scripts": {
+    "build": "esbuild portal-tiptap-editor.js --bundle --minify --format=iife --platform=browser --target=es2020 --legal-comments=inline --outfile=../portal-tiptap-editor.js"
+  },
+  "devDependencies": {
+    "@tiptap/core": "3.31.3",
+    "@tiptap/extension-image": "3.31.3",
+    "@tiptap/extension-table": "3.31.3",
+    "@tiptap/starter-kit": "3.31.3",
+    "esbuild": "0.27.0"
+  }
+}

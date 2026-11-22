@@ -21,10 +21,7 @@ DirectoryIndex index.php
     RewriteRule ^(vmts|cpl|ppm|kurikulum|dokumen|peminatan)/?$ index.php?bagian=$1 [QSA,L,NC]
 </IfModule>
 
-<FilesMatch "^(seed_nov2026|st_lib|install)\.php$">
-    Require all denied
-</FilesMatch>
-<FilesMatch "^(db|portal_lib|admin_page|masuk_page|install_portal)\.php$">
+<FilesMatch "^seed_nov2026\.php$">
     Require all denied
 </FilesMatch>
 <FilesMatch "\.(sql|md|json|log)$">

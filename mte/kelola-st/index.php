@@ -3,7 +3,7 @@ if (!defined('MTE_PORTAL_ROUTED')) {
     http_response_code(404);
     exit;
 }
-require_once __DIR__.'/../st_lib.php';
+require_once __DIR__.'/st_lib.php';
 date_default_timezone_set('Asia/Jakarta');
 header('X-Content-Type-Options: nosniff');
 header('Cache-Control: no-store');
@@ -154,11 +154,12 @@ $stTabs = [
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Kelola Surat Tugas · MTE UNSOED</title>
+<link rel="icon" type="image/svg+xml" href="<?= mte_st_escape($assetPath) ?>/unsoed-favicon.svg?v=1">
 <link rel="stylesheet" href="<?= mte_portal_escape($assetPath) ?>/st-base.css?v=1">
-<link rel="stylesheet" href="<?= mte_st_escape($assetPath) ?>/portal-admin.css?v=7">
-<link rel="stylesheet" href="<?= mte_st_escape($assetPath) ?>/portal-brand.css?v=1">
-<link rel="stylesheet" href="../st.css?v=4">
-<script src="../st.js?v=3" defer></script>
+<link rel="stylesheet" href="<?= mte_st_escape($assetPath) ?>/portal-admin.css?v=8">
+<link rel="stylesheet" href="<?= mte_st_escape($assetPath) ?>/portal-brand.css?v=2">
+<link rel="stylesheet" href="st.css?v=5">
+<script src="st.js?v=3" defer></script>
 </head>
 <body class="st-app admin-page">
 <header class="admin-header no-print">

@@ -244,7 +244,14 @@ function mte_portal_content_list(string $section): array
     if (!array_key_exists($section, mte_portal_sections())) {
         throw new InvalidArgumentException('Menu konten tidak dikenal.');
     }
-    return mte_portal_rows('SELECT * FROM mte_portal_content WHERE section=? ORDER BY sort_order, id', 's', [$section]);
+    $galleryColumn = $section === 'berita'
+        ? ', EXISTS (SELECT 1 FROM mte_portal_gallery AS g WHERE g.content_id = c.id) AS has_gallery_images'
+        : '';
+    return mte_portal_rows(
+        'SELECT c.*' . $galleryColumn . ' FROM mte_portal_content AS c WHERE c.section=? ORDER BY c.sort_order, c.id',
+        's',
+        [$section]
+    );
 }
 
 function mte_portal_content_by_id(int $id): ?array
@@ -307,6 +314,17 @@ function mte_portal_safe_href(string $href): string
     return '';
 }
 
+function mte_portal_keep_hyphenated_words_together(string $html): string
+{
+    $result = preg_replace_callback('/(<[^>]*>)|([^<]+)/u', static function (array $match): string {
+        if (!isset($match[2])) {
+            return $match[0];
+        }
+        return preg_replace('/(?<=\p{L})-(?=\p{L})/u', "\u{2011}", $match[2]) ?? $match[2];
+    }, $html);
+    return is_string($result) ? $result : $html;
+}
+
 function mte_portal_clean_html_children(DOMNode $parent, DOMDocument $document, bool $forStorage): void
 {
     $allowed = ['p', 'div', 'br', 'strong', 'b', 'em', 'i', 'u', 'ul', 'ol', 'li', 'a', 'img', 'h2', 'h3', 'blockquote', 'table', 'thead', 'tbody', 'tr', 'th', 'td'];
@@ -340,6 +358,8 @@ function mte_portal_clean_html_children(DOMNode $parent, DOMDocument $document, 
         $originalSource = (string) $child->getAttribute('src');
         $originalAlt = (string) $child->getAttribute('alt');
         $originalClass = (string) $child->getAttribute('class');
+        $originalWidth = (string) $child->getAttribute('width');
+        $originalHeight = (string) $child->getAttribute('height');
         for ($index = $child->attributes->length - 1; $index >= 0; $index--) {
             $attribute = $child->attributes->item($index);
             if ($attribute) {
@@ -370,7 +390,7 @@ function mte_portal_clean_html_children(DOMNode $parent, DOMDocument $document, 
                     }
                 }
             }
-            $imagePath = $relative !== '' ? __DIR__ . '/unggah/' . $relative : '';
+            $imagePath = $relative !== '' ? dirname(__DIR__) . '/unggah/' . $relative : '';
             if ($relative === '' || !is_file($imagePath)) {
                 $parent->removeChild($child);
                 continue;
@@ -378,6 +398,12 @@ function mte_portal_clean_html_children(DOMNode $parent, DOMDocument $document, 
             $child->setAttribute('src', $forStorage ? 'mte-upload:' . $relative : mte_portal_url('/unggah/' . $relative));
             $child->setAttribute('alt', mte_portal_text($originalAlt, 255, 'Teks alternatif gambar'));
             $child->setAttribute('loading', 'lazy');
+            if (preg_match('/^[1-9][0-9]{0,3}$/D', $originalWidth)) {
+                $child->setAttribute('width', $originalWidth);
+            }
+            if (preg_match('/^[1-9][0-9]{0,3}$/D', $originalHeight)) {
+                $child->setAttribute('height', $originalHeight);
+            }
         } elseif ($tag === 'div' && $originalClass === 'rich-table-scroll') {
             $child->setAttribute('class', 'rich-table-scroll');
         }
@@ -542,7 +568,7 @@ function mte_portal_store_pdf(array $upload): ?string
     if ($signature !== '%PDF-' || $finfo->file($upload['tmp_name']) !== 'application/pdf') {
         throw new InvalidArgumentException('Isi berkas tidak dikenali sebagai PDF.');
     }
-    $directory = __DIR__ . '/unggah/dokumen';
+    $directory = dirname(__DIR__) . '/unggah/dokumen';
     if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) {
         throw new RuntimeException('Folder dokumen belum dapat disiapkan.');
     }
@@ -570,7 +596,7 @@ function mte_portal_store_gallery_image(array $upload): ?string
     if (!isset($extensions[$mime]) || !getimagesize($upload['tmp_name'])) {
         throw new InvalidArgumentException('Galeri hanya menerima gambar JPG, PNG, atau WebP yang valid.');
     }
-    $directory = __DIR__ . '/unggah/galeri';
+    $directory = dirname(__DIR__) . '/unggah/galeri';
     if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) {
         throw new RuntimeException('Folder galeri belum dapat disiapkan.');
     }
@@ -583,8 +609,18 @@ function mte_portal_store_gallery_image(array $upload): ?string
 
 function mte_portal_store_inline_image(array $upload): string
 {
-    if (($upload['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK || !isset($upload['tmp_name']) || !is_uploaded_file($upload['tmp_name'])) {
+    $uploadError = (int) ($upload['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($uploadError === UPLOAD_ERR_INI_SIZE || $uploadError === UPLOAD_ERR_FORM_SIZE) {
+        throw new InvalidArgumentException('Batas unggah gambar di server terlampaui. Pilih gambar yang lebih kecil.');
+    }
+    if ($uploadError === UPLOAD_ERR_PARTIAL) {
+        throw new InvalidArgumentException('Unggah gambar terputus sebelum selesai. Coba pilih gambar kembali.');
+    }
+    if ($uploadError === UPLOAD_ERR_NO_FILE) {
         throw new InvalidArgumentException('Pilih gambar yang akan disisipkan.');
+    }
+    if ($uploadError !== UPLOAD_ERR_OK || !isset($upload['tmp_name']) || !is_uploaded_file($upload['tmp_name'])) {
+        throw new InvalidArgumentException('Unggah gambar gagal. Coba pilih gambar kembali.');
     }
     if ((int) ($upload['size'] ?? 0) < 8 || (int) $upload['size'] > 5 * 1024 * 1024) {
         throw new InvalidArgumentException('Ukuran gambar harus kurang dari 5 MB.');
@@ -594,7 +630,7 @@ function mte_portal_store_inline_image(array $upload): string
     if (!isset($extensions[$mime]) || !getimagesize($upload['tmp_name'])) {
         throw new InvalidArgumentException('Gambar hanya menerima JPG, PNG, atau WebP yang valid.');
     }
-    $directory = __DIR__ . '/unggah/konten';
+    $directory = dirname(__DIR__) . '/unggah/konten';
     if (!is_dir($directory) && !mkdir($directory, 0750, true) && !is_dir($directory)) {
         throw new RuntimeException('Folder gambar konten belum dapat disiapkan.');
     }
@@ -615,7 +651,7 @@ function mte_portal_remove_inline_image_if_unused(string $relativeName): void
     if ($used) {
         return;
     }
-    $path = __DIR__ . '/unggah/' . $relativeName;
+    $path = dirname(__DIR__) . '/unggah/' . $relativeName;
     if (is_file($path)) {
         unlink($path);
     }
@@ -630,7 +666,7 @@ function mte_portal_remove_gallery_file_if_unused(string $relativeName): void
     if ($used) {
         return;
     }
-    $path = __DIR__ . '/unggah/' . $relativeName;
+    $path = dirname(__DIR__) . '/unggah/' . $relativeName;
     if (is_file($path)) {
         unlink($path);
     }
@@ -704,7 +740,7 @@ function mte_portal_remove_file_if_unused(string $relativeName): void
     if ($used) {
         return;
     }
-    $path = __DIR__ . '/unggah/' . $relativeName;
+    $path = dirname(__DIR__) . '/unggah/' . $relativeName;
     if (is_file($path)) {
         unlink($path);
     }

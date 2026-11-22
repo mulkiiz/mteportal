@@ -1,0 +1,5 @@
+Options -Indexes
+
+<FilesMatch "^(admin_page|masuk_page)\.php$">
+    Require all denied
+</FilesMatch>

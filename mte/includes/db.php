@@ -5,7 +5,7 @@ function mte_config(): array
 {
     static $config = null;
     if ($config === null) {
-        $path = getenv('MTE_CONFIG_PATH') ?: dirname(__DIR__, 2) . '/mte-private/config.php';
+        $path = getenv('MTE_CONFIG_PATH') ?: dirname(__DIR__, 3) . '/mte-private/config.php';
         if (!is_file($path) || !is_readable($path)) {
             throw new RuntimeException('Konfigurasi database MTE belum tersedia.');
         }

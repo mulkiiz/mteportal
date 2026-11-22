@@ -102,12 +102,20 @@
         const imageAlt = window.prompt('Teks alternatif gambar', file.name.replace(/\.[^.]+$/, '')) || '';
 
         try {
-            const response = await fetch(form.action, {
+            const uploadUrl = new URL(form.getAttribute('action') || window.location.href, window.location.href);
+            uploadUrl.searchParams.set('ajax', 'gambar');
+            const response = await fetch(uploadUrl, {
                 method: 'POST',
                 body: payload,
                 credentials: 'same-origin',
                 headers: { Accept: 'application/json' }
             });
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.toLowerCase().includes('application/json')) {
+                throw new Error(response.status === 413
+                    ? 'Server menolak gambar karena ukurannya melewati batas unggah.'
+                    : `Server mengembalikan halaman HTML (HTTP ${response.status}), bukan jawaban unggah. Muat ulang halaman dan coba lagi.`);
+            }
             const result = await response.json();
             if (!response.ok || !result.ok || typeof result.url !== 'string') {
                 throw new Error(result.message || 'Gambar belum dapat diunggah.');
