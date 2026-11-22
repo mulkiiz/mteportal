@@ -3,6 +3,7 @@ DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteRule ^(robots\.txt|sitemap\.xml)$ index.php?seo=$1 [QSA,L,NC]
     RewriteRule ^(kelola_st|simulasi)\.php$ index.php [L]
     RewriteRule ^(kelola-st|simulasi-akreditasi)(/index\.php)?/?$ index.php [L]
     RewriteRule ^masuk/?$ index.php?route=masuk [QSA,L]
