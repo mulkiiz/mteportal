@@ -390,6 +390,17 @@ function mteSeoPlainText(string $value, int $limit = 300): string
     return substr($plain, 0, $limit);
 }
 
+function mteExcerpt(string $value, int $limit = 115): string
+{
+    $plain = mteSeoPlainText($value, $limit + 1);
+    $len = function_exists('mb_strlen') ? mb_strlen($plain, 'UTF-8') : strlen($plain);
+    if ($len <= $limit) {
+        return $plain;
+    }
+    $cut = function_exists('mb_substr') ? mb_substr($plain, 0, $limit, 'UTF-8') : substr($plain, 0, $limit);
+    return rtrim($cut) . '…';
+}
+
 function mteSeoAbsoluteUrl(string $baseUrl, string $path): string
 {
     return rtrim($baseUrl, '/') . '/' . ltrim($path, '/');
@@ -643,7 +654,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
     <?php endif; ?>
     <link rel="icon" type="image/svg+xml" href="<?= mteEscape($assetPath) ?>/unsoed-favicon.svg?v=1">
     <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/simulasi.css?v=2">
-    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=1">
+    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=8">
 </head>
 <body>
     <a class="skip-link" href="#main">Langsung ke konten</a>
@@ -673,6 +684,221 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
             </div>
         </section>
 
+        <?php
+        $isPortalHome = !$seoSectionWasRequested;
+        $tautanJurusan = [
+            ['campus', '', 'Profil Jurusan', 'Identitas dan arah jurusan'],
+            ['dosen', '#/faculty', 'Dosen', 'Profil tenaga pengajar'],
+            ['riset', '#/research', 'Riset', 'Bidang dan kegiatan riset'],
+            ['kemahasiswaan', '#/student-life', 'Kemahasiswaan', 'Kegiatan dan kehidupan mahasiswa'],
+        ];
+        ?>
+
+        <nav class="portal-nav portal-nav-top" aria-label="Menu portal MTE">
+            <a href="<?= mteEscape($portalPath) ?>"<?= $isPortalHome ? ' aria-current="page"' : '' ?> title="Ringkasan seluruh modul portal MTE">
+                <span class="menu-icon"><?php mteIcon($assetPath, 'campus'); ?></span>
+                <span>Beranda</span>
+            </a>
+            <?php foreach ($bagian as $kode => [$label, $judul, $deskripsi]): ?>
+                <a href="<?= mteEscape($portalPath . rawurlencode($kode)) ?>/#isi"<?= (!$isPortalHome && $aktif === $kode) ? ' aria-current="page"' : '' ?> title="<?= mteEscape($deskripsi) ?>">
+                    <span class="menu-icon"><?php mteIcon($assetPath, $kode); ?></span>
+                    <span><?= mteEscape($label) ?></span>
+                </a>
+            <?php endforeach; ?>
+        </nav>
+
+        <?php if ($isPortalHome): ?>
+            <?php
+            $beritaTerbaru = array_slice($berita, 0, 3);
+            $beritaUtama = $beritaTerbaru[0] ?? null;
+            $beritaLain = array_slice($beritaTerbaru, 1);
+            $dokumenRingkas = array_slice($dokumen, 0, 4);
+            $totalSksKurikulum = array_sum(array_map('intval', array_column($kurikulum, 'sks')));
+            ?>
+            <section id="isi" class="bento-portal" aria-label="Ringkasan portal MTE">
+                <div class="bento-grid">
+                    <div class="bento-box bento-span-12 bento-vmts">
+                        <div class="bento-head">
+                            <div class="bento-head-title">
+                                <span class="menu-icon"><?php mteIcon($assetPath, 'vmts'); ?></span>
+                                <div>
+                                    <span class="eyebrow">ARAH &amp; MANDAT</span>
+                                    <h2>Visi, Misi, Tujuan &amp; Strategi</h2>
+                                </div>
+                            </div>
+                            <a class="bento-more" href="<?= mteEscape($portalPath . 'vmts/#isi') ?>">Selengkapnya <?php mteIcon($assetPath, 'arrow'); ?></a>
+                        </div>
+                        <div class="bento-vmts-grid">
+                            <?php foreach ($vmts as $item): ?>
+                                <a class="bento-vmts-tile" href="<?= mteEscape($portalPath . 'vmts/#isi') ?>">
+                                    <span class="outcome-code"><?= mteEscape($item['label']) ?></span>
+                                    <h3><?= mteEscape($item['judul']) ?></h3>
+                                    <p><?= mteEscape(mteExcerpt((string) $item['teks'], 105)) ?></p>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <div class="bento-box bento-span-7 bento-news">
+                        <div class="bento-head">
+                            <div class="bento-head-title">
+                                <span class="menu-icon"><?php mteIcon($assetPath, 'berita'); ?></span>
+                                <div>
+                                    <span class="eyebrow">KABAR TERKINI</span>
+                                    <h2>Berita, Pengumuman &amp; Agenda</h2>
+                                </div>
+                            </div>
+                            <a class="bento-more" href="<?= mteEscape($portalPath . 'berita/#isi') ?>">Semua <?php mteIcon($assetPath, 'arrow'); ?></a>
+                        </div>
+                        <?php if ($beritaUtama !== null): ?>
+                            <a class="bento-news-featured" href="<?= mteUrlDetailBerita($basePath, (string) $beritaUtama['id'], '', 1) ?>">
+                                <div class="bento-news-meta">
+                                    <span class="news-type-tag news-type-<?= mteEscape($beritaUtama['jenis']) ?>"><?= mteEscape($tipeBerita[$beritaUtama['jenis']]) ?></span>
+                                    <?php mteNewsDate((string) $beritaUtama['tanggal']); ?>
+                                </div>
+                                <h3><?= mteEscape($beritaUtama['judul']) ?></h3>
+                                <p><?= mteEscape(mteExcerpt((string) $beritaUtama['ringkasan'], 150)) ?></p>
+                            </a>
+                        <?php endif; ?>
+                        <?php if ($beritaLain): ?>
+                            <div class="bento-news-list">
+                                <?php foreach ($beritaLain as $artikel): ?>
+                                    <a class="bento-news-row" href="<?= mteUrlDetailBerita($basePath, (string) $artikel['id'], '', 1) ?>">
+                                        <span class="news-type-tag news-type-<?= mteEscape($artikel['jenis']) ?>"><?= mteEscape($tipeBerita[$artikel['jenis']]) ?></span>
+                                        <strong class="bento-news-row-title"><?= mteEscape($artikel['judul']) ?></strong>
+                                        <span class="bento-news-row-date"><?= mteEscape(mteTanggal((string) $artikel['tanggal'])) ?></span>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="bento-box bento-span-5 bento-peminatan">
+                        <div class="bento-head">
+                            <div class="bento-head-title">
+                                <span class="menu-icon"><?php mteIcon($assetPath, 'peminatan'); ?></span>
+                                <div>
+                                    <span class="eyebrow">KONSENTRASI</span>
+                                    <h2>Peminatan Prodi</h2>
+                                </div>
+                            </div>
+                            <a class="bento-more" href="<?= mteEscape($portalPath . 'peminatan/#isi') ?>">Detail <?php mteIcon($assetPath, 'arrow'); ?></a>
+                        </div>
+                        <div class="bento-track-list">
+                            <?php foreach ($peminatan as $idx => $item): ?>
+                                <a class="bento-track-card" href="<?= mteEscape($portalPath . 'peminatan/#isi') ?>">
+                                    <span class="bento-track-badge">0<?= $idx + 1 ?></span>
+                                    <div>
+                                        <h3><?= mteEscape($item['judul']) ?></h3>
+                                        <p><?= mteEscape(mteExcerpt((string) $item['keterangan'], 110)) ?></p>
+                                    </div>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <div class="bento-box bento-span-4 bento-kurikulum">
+                        <div class="bento-head">
+                            <div class="bento-head-title">
+                                <span class="menu-icon"><?php mteIcon($assetPath, 'kurikulum'); ?></span>
+                                <div>
+                                    <span class="eyebrow">STRUKTUR STUDI</span>
+                                    <h2>Kurikulum</h2>
+                                </div>
+                            </div>
+                            <a class="bento-more" href="<?= mteEscape($portalPath . 'kurikulum/#isi') ?>">Lengkap <?php mteIcon($assetPath, 'arrow'); ?></a>
+                        </div>
+                        <div class="bento-stat-bar">
+                            <div><strong><?= (int) $totalSksKurikulum ?></strong><span>Total SKS</span></div>
+                            <div><strong><?= count($kurikulumPerSemester) ?></strong><span>Semester</span></div>
+                            <div><strong><?= count($kurikulum) ?></strong><span>Mata Kuliah</span></div>
+                        </div>
+                        <div class="bento-sem-grid">
+                            <?php foreach ($kurikulumPerSemester as $sem => $mks): ?>
+                                <?php $sksSem = array_sum(array_column($mks, 'sks')); ?>
+                                <a class="bento-sem-tile" href="<?= mteEscape($portalPath . 'kurikulum/#semester-' . (int) $sem) ?>">
+                                    <strong>Semester <?= (int) $sem ?></strong>
+                                    <span><?= (int) $sksSem ?> SKS · <?= count($mks) ?> MK</span>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <div class="bento-box bento-span-4 bento-dokumen">
+                        <div class="bento-head">
+                            <div class="bento-head-title">
+                                <span class="menu-icon"><?php mteIcon($assetPath, 'dokumen'); ?></span>
+                                <div>
+                                    <span class="eyebrow">UNDUHAN RESMI</span>
+                                    <h2>Dokumen Akademik</h2>
+                                </div>
+                            </div>
+                            <a class="bento-more" href="<?= mteEscape($portalPath . 'dokumen/#isi') ?>">Semua <?php mteIcon($assetPath, 'arrow'); ?></a>
+                        </div>
+                        <div class="bento-doc-list">
+                            <?php foreach ($dokumenRingkas as $doc): ?>
+                                <div class="bento-doc-row">
+                                    <a class="bento-doc-link" href="<?= mteUrlDetailDokumen($basePath, (string) $doc['id'], 1) ?>">
+                                        <span class="bento-doc-type"><?= mteEscape($doc['jenis']) ?></span>
+                                        <span class="bento-doc-title"><?= mteEscape($doc['judul']) ?></span>
+                                    </a>
+                                    <a class="bento-doc-dl" href="<?= mteEscape($portalPath . 'unggah/' . mteEncodePath((string) $doc['file'])) ?>" download aria-label="Unduh <?= mteEscape($doc['judul']) ?>">
+                                        <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5M12 15V3"/></svg>
+                                    </a>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <div class="bento-box bento-span-4 bento-kompetensi">
+                        <div class="bento-head">
+                            <div class="bento-head-title">
+                                <span class="menu-icon"><?php mteIcon($assetPath, 'cpl'); ?></span>
+                                <div>
+                                    <span class="eyebrow">KOMPETENSI</span>
+                                    <h2>CPL &amp; PPM Lulusan</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bento-stat-pair">
+                            <a class="bento-stat-card" href="<?= mteEscape($portalPath . 'cpl/#isi') ?>">
+                                <strong><?= count($cpl) ?></strong>
+                                <span>Butir CPL Prodi</span>
+                                <small>Capaian Pembelajaran →</small>
+                            </a>
+                            <a class="bento-stat-card" href="<?= mteEscape($portalPath . 'ppm/#isi') ?>">
+                                <strong><?= count($ppm) ?></strong>
+                                <span>Profil PPM</span>
+                                <small>Profil Mandiri →</small>
+                            </a>
+                        </div>
+                        <div class="bento-chip-cloud">
+                            <?php foreach (array_slice($cpl, 0, 4) as $item): ?>
+                                <a class="bento-chip" href="<?= mteEscape($portalPath . 'cpl/#isi') ?>">
+                                    <b>CPL-<?= mteEscape($item['kode']) ?></b> <?= mteEscape($item['judul']) ?>
+                                </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="portal-links" aria-labelledby="tautan-jurusan">
+                    <div class="portal-links-head">
+                        <span class="eyebrow">INFORMASI JURUSAN</span>
+                        <h3 id="tautan-jurusan">Jelajahi Jurusan Teknik Elektro</h3>
+                    </div>
+                    <div class="portal-links-grid">
+                        <?php foreach ($tautanJurusan as [$icon, $fragment, $label, $description]): ?>
+                            <a class="portal-link-tile" href="<?= mteEscape($situsJurusan . $fragment) ?>" target="_blank" rel="noopener noreferrer">
+                                <span class="menu-icon"><?php mteIcon($assetPath, $icon); ?></span>
+                                <span class="portal-link-text"><strong><?= mteEscape($label) ?></strong><small><?= mteEscape($description) ?></small></span>
+                                <span class="menu-external"><?php mteIcon($assetPath, 'external'); ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </section>
+            </section>
+        <?php else: ?>
         <section id="isi" class="tab-panel" aria-labelledby="judul-bagian">
             <div class="section-heading">
                 <span class="section-icon"><?php mteIcon($assetPath, $aktif); ?></span>
@@ -696,31 +922,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                 </div>
             </div>
 
-            <div class="portal-layout">
-                <nav class="portal-outline" aria-label="Menu portal MTE dan situs Jurusan Teknik Elektro">
-                    <div class="outline-section">INFORMASI PRODI</div>
-                    <?php foreach ($bagian as $kode => [$label, $judul, $deskripsi]): ?>
-                        <a href="<?= mteEscape($portalPath . rawurlencode($kode)) ?>/#isi"<?= $aktif === $kode ? ' aria-current="page"' : '' ?>>
-                            <span class="menu-icon"><?php mteIcon($assetPath, $kode); ?></span>
-                            <span><strong><?= mteEscape($label) ?></strong><small><?= mteEscape($deskripsi) ?></small></span>
-                        </a>
-                    <?php endforeach; ?>
-                    <div class="outline-section department-menu-label">INFORMASI JURUSAN</div>
-                    <?php foreach ([
-                        ['campus', '', 'Profil Jurusan', 'Identitas dan arah jurusan'],
-                        ['dosen', '#/faculty', 'Dosen', 'Profil tenaga pengajar'],
-                        ['riset', '#/research', 'Riset', 'Bidang dan kegiatan riset'],
-                        ['kemahasiswaan', '#/student-life', 'Kemahasiswaan', 'Kegiatan dan kehidupan mahasiswa'],
-                    ] as [$icon, $fragment, $label, $description]): ?>
-                        <a href="<?= mteEscape($situsJurusan . $fragment) ?>" target="_blank" rel="noopener noreferrer">
-                            <span class="menu-icon"><?php mteIcon($assetPath, $icon); ?></span>
-                            <span><strong><?= mteEscape($label) ?></strong><small><?= mteEscape($description) ?></small></span>
-                            <span class="menu-external"><?php mteIcon($assetPath, 'external'); ?></span>
-                        </a>
-                    <?php endforeach; ?>
-                </nav>
-
-                <div class="portal-content">
+            <div class="portal-content">
                     <?php if ($aktif === 'vmts' || $aktif === 'cpl' || $aktif === 'ppm'): ?>
                         <?php $daftar = $aktif === 'vmts' ? $vmts : ($aktif === 'cpl' ? $cpl : $ppm); ?>
                         <div class="outcome-list">
@@ -742,7 +944,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                             <?php foreach ($kurikulumPerSemester as $semester => $mataKuliahSemester): ?>
                                 <?php $totalSksSemester = array_sum(array_column($mataKuliahSemester, 'sks')); ?>
                                 <section class="curriculum-semester" aria-labelledby="semester-<?= (int) $semester ?>">
-                                    <header class="curriculum-semester-head">
+                                    <header class="curriculum-semester-head" data-semester="<?= (int) $semester ?>">
                                         <h3 id="semester-<?= (int) $semester ?>">Semester <?= (int) $semester ?></h3>
                                         <span class="curriculum-sks-total"><?= (int) $totalSksSemester ?> SKS</span>
                                     </header>
@@ -921,12 +1123,56 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
-            </div>
+
+            <section class="portal-links" aria-labelledby="tautan-jurusan">
+                <div class="portal-links-head">
+                    <span class="eyebrow">INFORMASI JURUSAN</span>
+                    <h3 id="tautan-jurusan">Jelajahi Jurusan Teknik Elektro</h3>
+                </div>
+                <div class="portal-links-grid">
+                    <?php foreach ($tautanJurusan as [$icon, $fragment, $label, $description]): ?>
+                        <a class="portal-link-tile" href="<?= mteEscape($situsJurusan . $fragment) ?>" target="_blank" rel="noopener noreferrer">
+                            <span class="menu-icon"><?php mteIcon($assetPath, $icon); ?></span>
+                            <span class="portal-link-text"><strong><?= mteEscape($label) ?></strong><small><?= mteEscape($description) ?></small></span>
+                            <span class="menu-external"><?php mteIcon($assetPath, 'external'); ?></span>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </section>
         </section>
+        <?php endif; ?>
 
         <footer class="page-footer">
-            <span>© 2026 Jurusan Teknik Elektro UNSOED. Seluruh hak cipta dilindungi.</span>
-            <span>Fakultas Teknik · Universitas Jenderal Soedirman</span>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="brand" href="<?= mteEscape($portalPath) ?>">
+                        <span class="brand-mark">MTE</span>
+                        <div><strong>Magister Teknik Elektro</strong><span>Jurusan Teknik Elektro</span></div>
+                    </a>
+                    <p>Portal akademik Program Studi Magister Teknik Elektro, Fakultas Teknik, Universitas Jenderal Soedirman.</p>
+                </div>
+                <nav class="footer-col" aria-label="Tautan portal">
+                    <span class="footer-title">PORTAL</span>
+                    <?php foreach ($bagian as $kode => $info): ?>
+                        <a href="<?= mteEscape($portalPath . rawurlencode($kode)) ?>/#isi"><?= mteEscape($info[1]) ?></a>
+                    <?php endforeach; ?>
+                </nav>
+                <nav class="footer-col" aria-label="Tautan jurusan">
+                    <span class="footer-title">JURUSAN</span>
+                    <?php foreach ($tautanJurusan as [$icon, $fragment, $label]): ?>
+                        <a href="<?= mteEscape($situsJurusan . $fragment) ?>" target="_blank" rel="noopener noreferrer"><?= mteEscape($label) ?></a>
+                    <?php endforeach; ?>
+                </nav>
+                <nav class="footer-col" aria-label="Situs resmi">
+                    <span class="footer-title">SITUS RESMI</span>
+                    <a href="<?= mteEscape($situsFakultas) ?>">Fakultas Teknik</a>
+                    <a href="<?= mteEscape($situsUnsoed) ?>">Universitas Jenderal Soedirman</a>
+                </nav>
+            </div>
+            <div class="footer-bottom">
+                <span>© 2026 Jurusan Teknik Elektro UNSOED. Seluruh hak cipta dilindungi.</span>
+                <span>Fakultas Teknik · Universitas Jenderal Soedirman</span>
+            </div>
         </footer>
     </main>
 </body>

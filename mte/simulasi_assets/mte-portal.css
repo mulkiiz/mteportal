@@ -15,26 +15,87 @@
         .tabs a { display: block; padding: 19px 0 16px; border-bottom: 3px solid transparent; color: var(--muted); font-size: 13px; font-weight: 600; white-space: nowrap; }
         .tabs a:hover { color: var(--teal); text-decoration: none; }
         .tabs a[aria-current="page"] { border-color: var(--teal); color: var(--teal); }
-        .tab-panel { min-height: 285px; }
+        .tab-panel { min-height: 285px; padding: 26px 26px 30px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: 0 8px 30px #163b430d; }
         .section-heading { justify-content: flex-start; gap: 14px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
         .section-icon { display: grid; width: 48px; height: 48px; flex: 0 0 48px; place-items: center; border: 1px solid #d0dffc; border-radius: 13px; background: #eaf1ff; color: var(--teal); }
         .section-icon .ui-icon { width: 23px; height: 23px; }
         .section-heading h1, .section-heading h2 { font-size: 30px; letter-spacing: -.9px; }
         .section-heading h1 { font-size: clamp(35px, 4vw, 53px); line-height: 1.1; letter-spacing: -2px; }
-        .portal-layout { display: grid; grid-template-columns: 228px minmax(0, 1fr); gap: 24px; align-items: start; }
-        .portal-outline { position: sticky; top: 86px; display: grid; gap: 3px; padding: 11px; border: 1px solid var(--line); border-radius: 13px; background: #fff; }
-        .portal-outline > a { display: flex; align-items: flex-start; gap: 9px; padding: 8px; border: 1px solid transparent; border-radius: 8px; color: var(--ink); font-size: 12px; line-height: 1.45; }
-        .portal-outline > a:hover, .portal-outline > a:focus-visible { border-color: #cedcf3; background: #f4f7ff; text-decoration: none; }
-        .portal-outline > a strong, .portal-outline > a small { display: block; }
-        .portal-outline > a strong { font-size: 12px; }
-        .portal-outline > a small { margin-top: 3px; color: #53686b; font-size: 11px; }
-        .portal-outline > a[aria-current="page"] { border-color: #c4d3f0; background: #eaf1ff; }
-        .portal-outline > a[aria-current="page"] strong { color: var(--teal); }
-        .portal-outline .outline-section { display: block; margin: 5px 8px 4px; color: #53686b; }
-        .portal-outline .department-menu-label { margin-top: 9px; padding-top: 10px; border-top: 1px solid var(--line); }
+        .portal-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; padding: 8px; border: 1px solid var(--line); border-radius: 16px; background: #fff; box-shadow: 0 4px 16px #163b430a; }
+        .portal-nav-top { margin-top: 22px; margin-bottom: 18px; }
+        .bento-portal { padding-bottom: 6px; }
+        .bento-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+        .bento-box { display: flex; flex-direction: column; min-width: 0; padding: 20px 22px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 6px 24px #163b430a; transition: border-color .18s ease, box-shadow .18s ease; }
+        .bento-box:hover { border-color: #c2d4f0; box-shadow: var(--shadow); }
+        .bento-span-7 { grid-column: span 7; }
+        .bento-span-5 { grid-column: span 5; }
+        .bento-span-4 { grid-column: span 4; }
+        .bento-span-12 { grid-column: span 12; }
+        .bento-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 10px 12px; margin-bottom: 14px; }
+        .bento-head-title { display: flex; align-items: center; gap: 10px; flex: 1 1 180px; min-width: 0; }
+        .bento-head-title > div { min-width: 0; }
+        .bento-head-title .menu-icon { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 10px; }
+        .bento-head-title .eyebrow { margin-bottom: 2px; font-size: 9.5px; }
+        .bento-head-title h2 { margin: 0; font-size: 16px; letter-spacing: -.3px; line-height: 1.25; overflow-wrap: anywhere; }
+        .bento-more { display: inline-flex; align-items: center; gap: 5px; flex: none; padding: 5px 10px; border: 1px solid #d7e3f5; border-radius: 999px; background: #f6f9ff; color: var(--teal); font-size: 11px; font-weight: 700; white-space: nowrap; }
+        .bento-more:hover { background: var(--teal); border-color: var(--teal); color: #fff; text-decoration: none; }
+        .bento-more .ui-icon { width: 13px; height: 13px; }
+        .bento-news-featured { display: block; padding: 14px 16px; border: 1px solid #dce6f7; border-radius: 13px; background: linear-gradient(145deg, #f7faff, #ffffff); color: inherit; transition: border-color .15s, transform .15s; }
+        .bento-news-featured:hover { border-color: #a9c4f2; transform: translateY(-2px); text-decoration: none; }
+        .bento-news-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; margin-bottom: 7px; }
+        .bento-news-meta .news-date { font-size: 10.5px; }
+        .bento-news-featured h3 { margin: 0 0 5px; color: var(--ink); font-size: 15px; line-height: 1.35; }
+        .bento-news-featured p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+        .bento-news-list { display: grid; gap: 7px; margin-top: 10px; }
+        .bento-news-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 9px 11px; border: 1px solid #e7edf5; border-radius: 10px; background: #fbfcfe; color: var(--ink); font-size: 12px; transition: background .15s, border-color .15s; }
+        .bento-news-row:hover { border-color: #c2d4f0; background: #f2f6ff; text-decoration: none; }
+        .bento-news-row-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; }
+        .bento-news-row-date { color: var(--muted); font-size: 10.5px; white-space: nowrap; }
+        .bento-track-list { display: grid; gap: 10px; flex: 1; }
+        .bento-track-card { display: flex; align-items: flex-start; gap: 12px; padding: 14px 15px; border: 1px solid #dce6f7; border-radius: 13px; background: #f8faff; color: inherit; transition: border-color .15s, transform .15s, background .15s; }
+        .bento-track-card:hover { border-color: #a9c4f2; background: #eff5ff; transform: translateY(-2px); text-decoration: none; }
+        .bento-track-badge { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px; border-radius: 9px; background: linear-gradient(135deg, #2d67c4, #3575d2); color: #fff; font-size: 11px; font-weight: 800; }
+        .bento-track-card h3 { margin: 0 0 4px; color: var(--ink); font-size: 13.5px; line-height: 1.35; }
+        .bento-track-card p { margin: 0; color: var(--muted); font-size: 11.5px; line-height: 1.6; }
+        .bento-stat-bar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
+        .bento-stat-bar > div { padding: 9px 8px; border: 1px solid #e1eaf7; border-radius: 11px; background: #f6f9ff; text-align: center; }
+        .bento-stat-bar strong { display: block; color: var(--teal); font-size: 19px; line-height: 1.1; font-weight: 800; }
+        .bento-stat-bar span { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 650; }
+        .bento-sem-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: auto; }
+        .bento-sem-tile { display: block; padding: 10px 11px; border: 1px solid #dce6f7; border-radius: 10px; background: #fbfcfe; color: var(--ink); transition: border-color .15s, background .15s; }
+        .bento-sem-tile:hover { border-color: var(--teal); background: #eef4ff; text-decoration: none; }
+        .bento-sem-tile strong { display: block; font-size: 12px; color: var(--ink); }
+        .bento-sem-tile span { display: block; margin-top: 2px; color: var(--muted); font-size: 10.5px; }
+        .bento-doc-list { display: grid; gap: 8px; margin-top: auto; }
+        .bento-doc-row { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border: 1px solid #e6ecf5; border-radius: 10px; background: #fbfcfe; }
+        .bento-doc-link { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; color: var(--ink); font-size: 12px; font-weight: 650; }
+        .bento-doc-link:hover { color: var(--teal); text-decoration: none; }
+        .bento-doc-type { flex: none; padding: 3px 6px; border-radius: 5px; background: #eaf1ff; color: var(--teal); font-size: 9.5px; font-weight: 800; }
+        .bento-doc-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .bento-doc-dl { display: inline-grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border: 1px solid #d5e2f5; border-radius: 8px; background: #eaf1ff; color: var(--teal); }
+        .bento-doc-dl:hover { border-color: var(--teal); background: var(--teal); color: #fff; text-decoration: none; }
+        .bento-stat-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-bottom: 12px; }
+        .bento-stat-card { display: block; padding: 12px 13px; border: 1px solid #dce6f7; border-radius: 12px; background: #f6f9ff; color: inherit; transition: border-color .15s, transform .15s; }
+        .bento-stat-card:hover { border-color: var(--teal); transform: translateY(-2px); text-decoration: none; }
+        .bento-stat-card strong { display: block; color: var(--teal); font-size: 24px; line-height: 1.05; font-weight: 800; }
+        .bento-stat-card span { display: block; margin-top: 3px; color: var(--ink); font-size: 12px; font-weight: 700; }
+        .bento-stat-card small { display: block; margin-top: 4px; color: var(--teal); font-size: 10.5px; font-weight: 650; }
+        .bento-chip-cloud { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+        .bento-chip { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; padding: 5px 9px; border: 1px solid #e1e9f5; border-radius: 999px; background: #fbfcfe; color: var(--muted); font-size: 10.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .bento-chip b { color: var(--teal); font-weight: 750; }
+        .bento-chip:hover { border-color: var(--teal); color: var(--ink); text-decoration: none; }
+        .bento-vmts-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; }
+        .bento-vmts-tile { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; padding: 14px 15px; border: 1px solid #dce6f7; border-radius: 13px; background: #fbfcfe; color: inherit; transition: border-color .15s, background .15s, transform .15s; }
+        .bento-vmts-tile:hover { border-color: #a9c4f2; background: #f4f8ff; transform: translateY(-2px); text-decoration: none; }
+        .bento-vmts-tile h3 { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.35; }
+        .bento-vmts-tile p { margin: 0; color: var(--muted); font-size: 11.5px; line-height: 1.6; }
+        .portal-nav > a { display: inline-flex; align-items: center; gap: 9px; padding: 7px 15px 7px 8px; border: 1px solid transparent; border-radius: 999px; color: var(--ink); font-size: 12.5px; font-weight: 650; transition: background .15s, border-color .15s, box-shadow .15s; }
+        .portal-nav > a:hover, .portal-nav > a:focus-visible { border-color: #cedcf3; background: #f4f7ff; text-decoration: none; }
+        .portal-nav > a[aria-current="page"] { border-color: transparent; background: linear-gradient(120deg, #2d67c4, #3575d2); color: #fff; box-shadow: 0 5px 14px #2d67c438; }
         .menu-icon { display: grid; width: 29px; height: 29px; flex: 0 0 29px; place-items: center; border-radius: 7px; background: #edf3ff; color: var(--teal); }
         .menu-icon .ui-icon { width: 16px; height: 16px; }
-        [aria-current="page"] > .menu-icon { background: #2563eb; color: #fff; }
+        .portal-nav > a .menu-icon { border-radius: 999px; }
+        [aria-current="page"] > .menu-icon { background: #ffffff2b; color: #fff; }
         .menu-external { margin: 4px 0 0 auto; color: #53686b; }
         .menu-external .ui-icon { width: 12px; height: 12px; }
         .portal-content { min-width: 0; }
@@ -49,21 +110,21 @@
         .outcome-code { align-self: start; padding: 5px 7px; border-radius: 5px; background: var(--teal-light); color: var(--teal); font-size: 10px; font-weight: 750; text-align: center; }
         .outcome h3 { margin: 0 0 5px; font-size: 14px; }
         .outcome p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
-        .curriculum-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 14px; }
+        .curriculum-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
         .curriculum-list > .empty-state { grid-column: 1 / -1; }
-        .curriculum-semester { overflow: hidden; border: 1px solid #d7e2f3; border-radius: 11px; background: #fff; box-shadow: 0 3px 12px #163b430a; }
-        .curriculum-semester-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 9px 12px; background: linear-gradient(105deg, #3575d2, #2d67c4); color: #fff; }
-        .curriculum-semester-head h3 { margin: 0; color: inherit; font-size: 15px; }
-        .curriculum-sks-total { padding: 3px 8px; border: 1px solid #ffffff55; border-radius: 999px; background: #ffffff1f; color: inherit; font-size: 11px; font-weight: 750; white-space: nowrap; }
-        .curriculum-courses { margin: 0; padding: 0; list-style: none; }
-        .curriculum-course { display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px; align-items: center; gap: 8px; min-height: 38px; padding: 8px 10px; line-height: 1.4; }
-        .curriculum-course + .curriculum-course { border-top: 1px solid #e6ebf5; }
-        .curriculum-course:nth-child(even) { background: #f6f9ff; }
-        .curriculum-course:hover { background: #eff5ff; }
-        .curriculum-course-code { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .curriculum-course h4 { margin: 0; color: var(--ink); font-size: 12px; font-weight: 650; overflow-wrap: anywhere; }
-        .curriculum-course-code { color: #4b6269; font: 600 10px/1.35 Consolas, "Courier New", monospace; }
-        .curriculum-course-sks { padding-left: 6px; border-left: 1px solid #d5e0f3; color: var(--ink); font-size: 11px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+        .curriculum-semester { --acc: #3575d2; --acc-dark: #2d67c4; --acc-soft: #eef3fd; position: relative; overflow: hidden; border: 1px solid #d7e2f3; border-radius: 14px; background: #fff; box-shadow: 0 6px 20px #163b4310; transition: transform .2s, box-shadow .2s; }
+        .curriculum-semester:hover { transform: translateY(-2px); box-shadow: 0 12px 28px #163b4318; }
+        .curriculum-semester-head { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; overflow: hidden; background: linear-gradient(120deg, var(--acc-dark), var(--acc)); color: #fff; }
+        .curriculum-semester-head::after { content: attr(data-semester); position: absolute; right: 74px; bottom: -26px; color: #ffffff18; font-size: 84px; font-weight: 800; line-height: 1; pointer-events: none; }
+        .curriculum-semester-head h3 { position: relative; z-index: 1; margin: 0; color: inherit; font-size: 16px; letter-spacing: .2px; }
+        .curriculum-sks-total { position: relative; z-index: 1; padding: 4px 11px; border: 1px solid #ffffff66; border-radius: 999px; background: #ffffff26; color: inherit; font-size: 11px; font-weight: 750; white-space: nowrap; }
+        .curriculum-courses { margin: 0; padding: 6px 0; list-style: none; }
+        .curriculum-course { display: grid; grid-template-columns: 70px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 9px 14px; line-height: 1.4; transition: background .15s; }
+        .curriculum-course + .curriculum-course { border-top: 1px dashed #dfe7f4; }
+        .curriculum-course:hover { background: var(--acc-soft); }
+        .curriculum-course-code { overflow: hidden; padding: 3px 6px; border-radius: 6px; background: var(--acc-soft); color: var(--acc-dark); font: 700 10px/1.35 Consolas, "Courier New", monospace; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+        .curriculum-course h4 { margin: 0; color: var(--ink); font-size: 12.5px; font-weight: 650; overflow-wrap: anywhere; }
+        .curriculum-course-sks { min-width: 44px; padding: 3px 8px; border-radius: 999px; background: var(--acc-soft); color: var(--acc-dark); font-size: 10.5px; font-weight: 750; font-variant-numeric: tabular-nums; text-align: center; white-space: nowrap; }
         .rich-content { color: var(--muted); font-size: 12px; line-height: 1.8; overflow-wrap: break-word; word-break: normal; hyphens: none; }
         .rich-content p { margin: 0 0 10px; color: inherit; font: inherit; line-height: inherit; }
         .rich-content p:last-child { margin-bottom: 0; }
@@ -150,27 +211,59 @@
             border-color: #b2c6ef;
             box-shadow: var(--shadow);
         }
-        .page-footer { margin-top: 18px; }
+        .portal-links { margin-top: 36px; }
+        .portal-links-head { margin-bottom: 15px; }
+        .portal-links-head .eyebrow { margin-bottom: 6px; }
+        .portal-links-head h3 { margin: 0; font-size: 20px; letter-spacing: -.4px; }
+        .portal-links-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 11px; }
+        .portal-link-tile { display: flex; align-items: center; gap: 10px; padding: 13px 14px; border: 1px solid var(--line); border-radius: 13px; background: #fff; transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+        .portal-link-tile:hover, .portal-link-tile:focus-visible { transform: translateY(-2px); border-color: #b2c6ef; box-shadow: var(--shadow); text-decoration: none; }
+        .portal-link-text { min-width: 0; }
+        .portal-link-text strong, .portal-link-text small { display: block; }
+        .portal-link-text strong { color: var(--ink); font-size: 12.5px; }
+        .portal-link-text small { margin-top: 2px; color: var(--muted); font-size: 10.5px; line-height: 1.5; }
+        .page-footer { margin-top: 44px; padding: 36px 32px 4px; border-radius: 20px; background: linear-gradient(160deg, #173250, #0f2237); color: #b9c9d4; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 28px; padding-bottom: 24px; border-bottom: 1px solid #ffffff1f; }
+        .page-footer .brand { color: #fff; }
+        .page-footer .brand > div > span { color: #8aa2b3; }
+        .footer-brand p { margin: 14px 0 0; max-width: 320px; color: #93aabf; font-size: 11.5px; line-height: 1.75; }
+        .footer-col { display: grid; gap: 8px; align-content: start; justify-items: start; }
+        .footer-title { margin-bottom: 4px; color: #7e97a8; font-size: 10px; font-weight: 750; letter-spacing: 1px; }
+        .footer-col a { color: #cddce6; font-size: 12px; }
+        .footer-col a:hover { color: #fff; }
+        .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding: 15px 0; color: #8aa2b3; font-size: 10.5px; }
         @media (min-width: 1160px) {
-            .curriculum-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+            .curriculum-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
             .curriculum-semester-head { padding-inline: 12px; }
+            .curriculum-semester-head::after { right: 56px; font-size: 70px; }
             .curriculum-course {
-                grid-template-columns: 54px minmax(0, 1fr) 42px;
+                grid-template-columns: 54px minmax(0, 1fr) auto;
                 gap: 7px;
-                min-height: 38px;
-                padding: 7px 9px;
+                min-height: 40px;
+                padding: 8px 9px;
             }
             .curriculum-course h4 { font-size: 12px; letter-spacing: -.1px; }
             .curriculum-course-code, .curriculum-course-sks { font-size: 10px; }
+            .curriculum-course-sks { min-width: 0; padding-inline: 6px; }
+        }
+        @media (max-width: 1040px) {
+            .bento-span-7, .bento-span-5 { grid-column: span 12; }
+            .bento-span-4 { grid-column: span 6; }
+            .bento-kompetensi { grid-column: span 12; }
+            .bento-vmts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 800px) {
-            .portal-layout { grid-template-columns: minmax(0, 1fr); gap: 17px; }
-            .portal-outline { position: static; grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); gap: 6px; }
-            .portal-outline > .outline-section { grid-column: 1 / -1; }
-            .portal-outline > a { padding: 7px 6px; }
+            .portal-nav { flex-wrap: nowrap; overflow-x: auto; }
+            .portal-nav > a { flex: none; }
+            .portal-links-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
             .menu-external { display: none; }
         }
         @media (max-width: 640px) {
+            .bento-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+            .bento-box { grid-column: auto; padding: 16px; border-radius: 15px; }
+            .bento-news-row { grid-template-columns: auto minmax(0, 1fr); }
+            .bento-news-row-date { grid-column: 1 / -1; }
+            .bento-vmts-grid { grid-template-columns: minmax(0, 1fr); }
             .site-header { height: auto; min-height: 76px; align-items: flex-start; flex-direction: column; gap: 8px; padding: 10px 16px; }
             .header-tools { width: 100%; justify-content: flex-start; gap: 8px; }
             .header-tools a { font-size: 10px; }
@@ -180,15 +273,27 @@
             .vision-index blockquote { font-size: 11px; line-height: 1.65; }
             .tabs { gap: 19px; margin-right: -16px; margin-left: -16px; padding: 0 16px; }
             .tabs a { padding: 16px 0 13px; font-size: 11px; }
-            .tab-panel { padding-top: 25px; }
+            .tab-panel { padding: 20px 16px 24px; }
+            .portal-links-grid { grid-template-columns: minmax(0, 1fr); }
+            .page-footer { margin-top: 30px; padding: 28px 20px 4px; }
+            .footer-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
             .section-heading { gap: 12px; margin-bottom: 19px; }
             .section-icon { width: 40px; height: 40px; flex-basis: 40px; }
             .section-heading h1, .section-heading h2 { font-size: 24px; }
             .section-heading p { font-size: 11px; }
             .idea-grid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
             .curriculum-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-            .curriculum-course { grid-template-columns: 64px minmax(0, 1fr) 44px; gap: 8px; padding-inline: 9px; }
+            .curriculum-course { grid-template-columns: 64px minmax(0, 1fr) auto; gap: 8px; padding-inline: 11px; }
             .curriculum-course h4 { font-size: 12px; }
+            .curriculum-semester-head::after { right: 54px; }
+        }
+        @media (max-width: 360px) {
+            .bento-stat-bar, .bento-stat-pair, .bento-sem-grid { grid-template-columns: minmax(0, 1fr); }
+            .curriculum-course { grid-template-columns: auto minmax(0, 1fr); }
+            .curriculum-course h4 { grid-column: 1 / -1; grid-row: 2; }
+            .curriculum-course-sks { justify-self: end; }
+        }
+        @media (max-width: 640px) {
             .idea-card { padding: 18px; }
             .outcome { grid-template-columns: 52px minmax(0, 1fr); gap: 11px; padding: 15px 12px; }
             .news-card { padding: 17px; }
