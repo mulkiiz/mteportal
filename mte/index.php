@@ -51,9 +51,9 @@ $bagian = [
     'cpl' => ['CPL Prodi', 'Capaian Pembelajaran Lulusan', 'Capaian pembelajaran lulusan'],
     'ppm' => ['PPM Prodi', 'Profil Profesional Mandiri', 'Profil profesional mandiri lulusan'],
     'kurikulum' => ['Kurikulum', 'Kurikulum Program Studi', 'Daftar mata kuliah dan beban SKS per semester'],
+    'peminatan' => ['Peminatan', 'Peminatan Program Studi', 'Energi Listrik Cerdas (ELC) dan Teknologi Informasi dan Biomedis (TIB)'],
     'berita' => ['Berita', 'Berita Program Studi', 'Berita, pengumuman, dan agenda program studi'],
     'dokumen' => ['Dokumen', 'Dokumen Program Studi', 'Pedoman dan berkas akademik'],
-    'peminatan' => ['Peminatan', 'Peminatan Program Studi', 'Energi Listrik Cerdas (ELC) dan Teknologi Informasi dan Biomedis (TIB)'],
 ];
 $pilihanBagian = $_GET['bagian'] ?? 'vmts';
 $aktif = is_string($pilihanBagian) && isset($bagian[$pilihanBagian]) ? $pilihanBagian : 'vmts';
@@ -654,7 +654,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
     <?php endif; ?>
     <link rel="icon" type="image/svg+xml" href="<?= mteEscape($assetPath) ?>/unsoed-favicon.svg?v=1">
     <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/simulasi.css?v=2">
-    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=8">
+    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=10">
 </head>
 <body>
     <a class="skip-link" href="#main">Langsung ke konten</a>
@@ -675,8 +675,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
             <div>
                 <span class="eyebrow">PORTAL PROGRAM STUDI</span>
                 <h1>Portal Akademik<br><span>S2 Teknik Elektro Unsoed</span></h1>
-                <p>Menyajikan informasi VMTS, CPL, PPM, Pengumuman, Agenda dan Berita</p>
-                <p class="hero-seo-intro">Program Studi Magister Teknik Elektro UNSOED di Purwokerto, Jawa Tengah.</p>
+                <p>Menyajikan informasi VMTS, CPL, PPM, Kurikulum, Pengumuman, Agenda dan Berita</p>
             </div>
             <div class="hero-index vision-index">
                 <span class="mini-label"><?php mteIcon($assetPath, 'vmts'); ?> VISI PROGRAM STUDI</span>
@@ -1149,7 +1148,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                         <span class="brand-mark">MTE</span>
                         <div><strong>Magister Teknik Elektro</strong><span>Jurusan Teknik Elektro</span></div>
                     </a>
-                    <p>Portal akademik Program Studi Magister Teknik Elektro, Fakultas Teknik, Universitas Jenderal Soedirman.</p>
+                    <p>Jln. Mayjen Sungkono Km.5 Kec. Kalimanah Kab.Purbalingga</p>
                 </div>
                 <nav class="footer-col" aria-label="Tautan portal">
                     <span class="footer-title">PORTAL</span>

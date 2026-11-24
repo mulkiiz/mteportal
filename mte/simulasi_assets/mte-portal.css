@@ -3,10 +3,12 @@
         .brand-mark:hover { text-decoration: none; }
         .brand > div > span { font-size: 10px; letter-spacing: .3px; }
         .header-tools { gap: 14px; flex-wrap: wrap; justify-content: flex-end; }
-        .header-tools a { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; white-space: nowrap; }
+        .header-tools a { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 11px; white-space: nowrap; text-decoration: none; transition: color .15s; }
+        .header-tools a:hover, .header-tools a:focus-visible { color: var(--teal); text-decoration: none; }
         .header-tools a .ui-icon { width: 15px; height: 15px; color: var(--teal); }
         .header-tools a + a { padding-left: 14px; border-left: 1px solid var(--line); }
         .hero { margin-top: 24px; padding: clamp(24px, 4vw, 48px); border: 1px solid #d7e3f5; border-radius: 20px; background: radial-gradient(ellipse at 100% 0%, #dbe8ff 0%, transparent 60%), #f3f7ff; }
+        .hero > div > p { margin-top: 14px; font-size: 13.5px; line-height: 1.65; }
         .vision-index { display: block; max-width: 410px; justify-self: end; border: 1px solid #d7e3f5; border-radius: 12px; padding: 17px 20px; background: #ffffffc9; }
         .vision-index .mini-label { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
         .vision-index .mini-label .ui-icon { width: 15px; height: 15px; }
@@ -229,8 +231,8 @@
         .footer-brand p { margin: 14px 0 0; max-width: 320px; color: #93aabf; font-size: 11.5px; line-height: 1.75; }
         .footer-col { display: grid; gap: 8px; align-content: start; justify-items: start; }
         .footer-title { margin-bottom: 4px; color: #7e97a8; font-size: 10px; font-weight: 750; letter-spacing: 1px; }
-        .footer-col a { color: #cddce6; font-size: 12px; }
-        .footer-col a:hover { color: #fff; }
+        .footer-col a { color: #cddce6; font-size: 12px; text-decoration: none; transition: color .15s; }
+        .footer-col a:hover, .footer-col a:focus-visible { color: #fff; text-decoration: none; }
         .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding: 15px 0; color: #8aa2b3; font-size: 10.5px; }
         @media (min-width: 1160px) {
             .curriculum-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -269,6 +271,7 @@
             .header-tools a { font-size: 10px; }
             .header-tools a + a { padding-left: 8px; }
             .hero { margin-top: 13px; gap: 18px; }
+            .hero > div > p { font-size: 12px; }
             .vision-index { max-width: none; justify-self: stretch; padding: 13px; }
             .vision-index blockquote { font-size: 11px; line-height: 1.65; }
             .tabs { gap: 19px; margin-right: -16px; margin-left: -16px; padding: 0 16px; }
@@ -307,4 +310,5 @@
             .gallery-dialog { padding: 10px; }
             .pager { align-items: flex-start; flex-direction: column; }
         }
-.brand { text-decoration: none; color: inherit; }
+.brand, .brand:hover, .brand:focus-visible { text-decoration: none; color: inherit; }
+.button:hover, .news-read:hover, .document-actions > a:first-child:hover { text-decoration: none; }
