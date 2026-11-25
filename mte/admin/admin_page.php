@@ -192,7 +192,7 @@ $checkedActive = array_key_exists('is_active', $formData)
     <meta name="color-scheme" content="light">
     <title>Dashboard Pengelola · MTE UNSOED</title>
     <link rel="icon" type="image/svg+xml" href="<?= mteEscape($assetPath) ?>/unsoed-favicon.svg?v=1">
-    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/portal-admin.css?v=15">
+    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/portal-admin.css?v=16">
     <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/portal-brand.css?v=2">
 </head>
 <body class="admin-page">
@@ -304,13 +304,22 @@ $checkedActive = array_key_exists('is_active', $formData)
                             <input type="hidden" name="kind" value="PDF">
                             <label>Berkas PDF <small>Maksimal 5 MB<?= $isEditing ? '; kosongkan jika tetap memakai berkas sekarang' : '' ?></small><input type="file" name="file_pdf" accept="application/pdf,.pdf"<?= $isEditing ? '' : ' required' ?>></label>
                             <?php if ($isEditing && !empty($editItem['file_name'])): ?><p class="admin-current-file">Berkas saat ini: <strong><?= mte_portal_escape(basename((string) $editItem['file_name'])) ?></strong></p><?php endif; ?>
+                        <?php elseif ($adminMenu === 'dosen'): ?>
+                            <label>Nama lengkap dan gelar <small>Contoh: Dr. Ir. Ari Fadli, M.Eng.</small><input type="text" name="title" maxlength="255" value="<?= mte_portal_escape($formValue('title')) ?>" required></label>
+                            <label>URL Google Scholar <small>Tautan profil Google Scholar dosen</small><input type="url" name="file_name" maxlength="255" placeholder="https://scholar.google.com/citations?user=..." value="<?= mte_portal_escape($formValue('file_name')) ?>" required></label>
+                            <label>Bidang riset <small>Pisahkan tiap bidang dengan titik koma (;)</small><textarea name="summary" rows="2" maxlength="5000" placeholder="Machine Learning; Deep Learning; Artificial Intelligence"><?= mte_portal_escape($formValue('summary')) ?></textarea></label>
+                            <div class="admin-form-grid admin-form-grid-3">
+                                <label>Citations (All)<input type="number" name="code" min="0" value="<?= mte_portal_escape($formValue('code', '0')) ?>" required></label>
+                                <label>h-index (All)<input type="number" name="kind" min="0" value="<?= mte_portal_escape($formValue('kind', '0')) ?>" required></label>
+                                <label>i10-index (All)<input type="number" name="label" min="0" value="<?= mte_portal_escape($formValue('label', '0')) ?>" required></label>
+                            </div>
                         <?php endif; ?>
-                        <?php if ($adminMenu !== 'cpl' && $adminMenu !== 'kurikulum'): ?><label>Judul<input type="text" name="title" maxlength="255" value="<?= mte_portal_escape($formValue('title')) ?>" required></label><?php endif; ?>
-                        <?php if ($adminMenu !== 'kurikulum'): ?><label>Slug URL <small>Boleh dikosongkan agar dibuat otomatis dari judul</small><input type="text" name="slug" maxlength="140" value="<?= mte_portal_escape($formValue('slug')) ?>" pattern="[A-Za-z0-9-]+"></label><?php endif; ?>
+                        <?php if ($adminMenu !== 'cpl' && $adminMenu !== 'kurikulum' && $adminMenu !== 'dosen'): ?><label>Judul<input type="text" name="title" maxlength="255" value="<?= mte_portal_escape($formValue('title')) ?>" required></label><?php endif; ?>
+                        <?php if ($adminMenu !== 'kurikulum'): ?><label>Slug URL <small>Boleh dikosongkan agar dibuat otomatis dari <?= $adminMenu === 'dosen' ? 'nama dosen tanpa gelar' : 'judul' ?></small><input type="text" name="slug" maxlength="140" value="<?= mte_portal_escape($formValue('slug')) ?>" pattern="[A-Za-z0-9-]+"></label><?php endif; ?>
                         <?php if ($adminMenu === 'berita' || $adminMenu === 'dokumen'): ?>
                             <label>Ringkasan untuk daftar<textarea name="summary" rows="3" maxlength="5000"><?= mte_portal_escape($formValue('summary')) ?></textarea></label>
                         <?php endif; ?>
-                        <?php if ($adminMenu !== 'kurikulum'): ?><div class="admin-rich-field">
+                        <?php if ($adminMenu !== 'kurikulum' && $adminMenu !== 'dosen'): ?><div class="admin-rich-field">
                             <span class="admin-field-label"><?= $adminMenu === 'berita' || $adminMenu === 'dokumen' ? 'Narasi detail' : 'Detail' ?></span>
                             <?php if ($adminMenu === 'berita'): ?>
                                 <div class="rich-editor-frame tiptap-frame">
@@ -427,7 +436,7 @@ $checkedActive = array_key_exists('is_active', $formData)
                                             || (stripos($body, '<img') !== false && strpos(mte_portal_sanitize_html($body), '<img ') !== false);
                                     }
                                     ?>
-                                    <?php $rowMeta = $row['section'] === 'berita' ? ucfirst((string) $row['kind']) . ' · ' . (string) $row['publish_date'] : ($row['section'] === 'cpl' ? 'CPL-' . (string) $row['code'] : ($row['section'] === 'kurikulum' ? 'Semester ' . (string) $row['label'] . ' · ' . (string) $row['code'] . ' · ' . (string) $row['summary'] . ' SKS · ' . (string) $row['kind'] : ($row['label'] ?: ($row['code'] ?: ($row['kind'] ?: ($row['section'] === 'dokumen' ? basename((string) $row['file_name']) : '—')))))); ?>
+                                    <?php $rowMeta = $row['section'] === 'berita' ? ucfirst((string) $row['kind']) . ' · ' . (string) $row['publish_date'] : ($row['section'] === 'cpl' ? 'CPL-' . (string) $row['code'] : ($row['section'] === 'kurikulum' ? 'Semester ' . (string) $row['label'] . ' · ' . (string) $row['code'] . ' · ' . (string) $row['summary'] . ' SKS · ' . (string) $row['kind'] : ($row['section'] === 'dosen' ? 'Cited ' . (int) $row['code'] . ' · h-index ' . (int) $row['kind'] . ' · i10 ' . (int) $row['label'] : ($row['label'] ?: ($row['code'] ?: ($row['kind'] ?: ($row['section'] === 'dokumen' ? basename((string) $row['file_name']) : '—'))))))); ?>
                                     <tr>
                                         <td>
                                             <div class="admin-row-title">
@@ -436,7 +445,7 @@ $checkedActive = array_key_exists('is_active', $formData)
                                                     <span class="admin-image-badge"><?php mteIcon($assetPath, 'gambar'); ?> Gambar</span>
                                                 <?php endif; ?>
                                             </div>
-                                            <small><?= mte_portal_escape((string) $row['slug']) ?></small>
+                                            <small><?= mte_portal_escape($row['section'] === 'dosen' ? ((string) $row['summary'] ?: (string) $row['slug']) : (string) $row['slug']) ?></small>
                                         </td>
                                         <td><?= mte_portal_escape($rowMeta) ?></td>
                                         <td><span class="admin-status<?= (int) $row['is_active'] === 1 ? ' is-live' : '' ?>"><?= (int) $row['is_active'] === 1 ? 'Tayang' : 'Draft' ?></span></td>

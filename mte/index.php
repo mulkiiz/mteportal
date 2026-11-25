@@ -52,6 +52,7 @@ $bagian = [
     'ppm' => ['PPM Prodi', 'Profil Profesional Mandiri', 'Profil profesional mandiri lulusan'],
     'kurikulum' => ['Kurikulum', 'Kurikulum Program Studi', 'Daftar mata kuliah dan beban SKS per semester'],
     'peminatan' => ['Peminatan', 'Peminatan Program Studi', 'Energi Listrik Cerdas (ELC) dan Teknologi Informasi dan Biomedis (TIB)'],
+    'dosen' => ['Dosen', 'Dosen Program Studi', 'Daftar dosen, bidang riset, dan tautan Google Scholar'],
     'berita' => ['Berita', 'Berita Program Studi', 'Berita, pengumuman, dan agenda program studi'],
     'dokumen' => ['Dokumen', 'Dokumen Program Studi', 'Pedoman dan berkas akademik'],
 ];
@@ -127,10 +128,22 @@ $peminatan = [
     ['judul' => 'Teknologi Informasi dan Biomedis (TIB)', 'keterangan' => 'CONTOH NARASI: Pendalaman rekayasa teknologi informasi, sistem komputasi, instrumentasi, dan aplikasi biomedis.'],
 ];
 
+$dosen = [
+    ['nama' => 'Arief Sudarmaji, Ph.D', 'scholar' => 'https://scholar.google.com/citations?user=ooEkh_4AAAAJ&hl=en', 'bidang' => 'Control; Electronics; Instrumentation; Agricultural Engineering', 'citations' => 267, 'h_index' => 9, 'i10_index' => 8],
+    ['nama' => 'Dr. Ir. Ari Fadli, M.Eng.', 'scholar' => 'https://scholar.google.com/citations?user=OUDUTj0AAAAJ&hl=id', 'bidang' => 'Machine Learning; Deep Learning; Artificial Intelligence; Information System', 'citations' => 812, 'h_index' => 15, 'i10_index' => 23],
+    ['nama' => 'Dr. Ir. Farida Asriani, M.T.', 'scholar' => 'https://scholar.google.com/citations?user=vSLVtycAAAAJ&hl=id', 'bidang' => 'Image Processing; Computer Vision; Artificial Intelligece & Machine Learning; Intelligent System', 'citations' => 96, 'h_index' => 5, 'i10_index' => 4],
+    ['nama' => 'Ir. Hari Siswantoro, Ph.D', 'scholar' => 'https://scholar.google.com/citations?user=LZHFkBAAAAAJ&hl=en', 'bidang' => 'automated analysis; security; access control; legal compliance', 'citations' => 96, 'h_index' => 4, 'i10_index' => 2],
+    ['nama' => 'Prof. Dr. Ir. Jamrud Aminuddin', 'scholar' => 'https://scholar.google.com/citations?user=liJ_0egAAAAJ&hl=en', 'bidang' => 'Theoretical and Computational Physics; Atmospheric Remote Sensing', 'citations' => 364, 'h_index' => 11, 'i10_index' => 12],
+    ['nama' => 'Dr. Ir. Mulki Indana Zulfa, M.T.', 'scholar' => 'https://scholar.google.com/citations?user=TqYM_x4AAAAJ&hl=en', 'bidang' => 'information technology; database; data mining; web programming', 'citations' => 370, 'h_index' => 11, 'i10_index' => 12],
+    ['nama' => 'Prof. Dr. Eng. Ir. Retno Supriyanti', 'scholar' => 'https://scholar.google.com/citations?user=vUJQJu4AAAAJ&hl=id', 'bidang' => 'image processing; artifcial intelligence; telemedicine; sensor and actuator; Renewable Energy', 'citations' => 477, 'h_index' => 13, 'i10_index' => 18],
+    ['nama' => 'Prof. Dr. Eng. Ir. Suroso', 'scholar' => 'https://scholar.google.com/citations?user=nXhlkmUAAAAJ&hl=id', 'bidang' => 'Power Electronics; Renewable Energy', 'citations' => 411, 'h_index' => 10, 'i10_index' => 12],
+    ['nama' => 'Dr. Ir. Acep Taryana, M.T.', 'scholar' => 'https://scholar.google.com/citations?user=EjvohFkAAAAJ&hl=id', 'bidang' => 'Software Engineering; Formal Method; Verification System', 'citations' => 157, 'h_index' => 7, 'i10_index' => 5],
+];
+
 try {
     require_once __DIR__ . '/includes/portal_lib.php';
     $kontenDariDatabase = mte_portal_public_content();
-    $vmts = $cpl = $ppm = $kurikulum = $berita = $dokumen = $peminatan = [];
+    $vmts = $cpl = $ppm = $kurikulum = $berita = $dokumen = $peminatan = $dosen = [];
     foreach ($kontenDariDatabase as $row) {
         if ($row['section'] === 'vmts') {
             $vmts[] = ['label' => $row['label'], 'judul' => $row['title'], 'teks' => $row['body']];
@@ -159,6 +172,15 @@ try {
             $dokumen[] = ['id' => $row['slug'], 'jenis' => $row['kind'] ?: 'PDF', 'judul' => $row['title'], 'keterangan' => $row['summary'], 'narasi' => $row['body'], 'file' => $row['file_name']];
         } elseif ($row['section'] === 'peminatan') {
             $peminatan[] = ['judul' => $row['title'], 'keterangan' => $row['body']];
+        } elseif ($row['section'] === 'dosen') {
+            $dosen[] = [
+                'nama' => (string) $row['title'],
+                'scholar' => (string) $row['file_name'],
+                'bidang' => (string) $row['summary'],
+                'citations' => (int) $row['code'],
+                'h_index' => (int) $row['kind'],
+                'i10_index' => (int) $row['label'],
+            ];
         }
     }
 } catch (Throwable $e) {
@@ -218,6 +240,23 @@ function mteIcon(string $assetPath, string $name): void
 function mteEncodePath(string $path): string
 {
     return implode('/', array_map('rawurlencode', explode('/', $path)));
+}
+
+function mteSafeExternalUrl(string $url): string
+{
+    $url = trim($url);
+    if ($url === '' || !preg_match('#^https?://#i', $url) || filter_var($url, FILTER_VALIDATE_URL) === false) {
+        return '';
+    }
+    return $url;
+}
+
+function mteDosenFields(string $raw): array
+{
+    $parts = preg_split('/\s*;\s*/', trim($raw)) ?: [];
+    return array_values(array_filter(array_map('trim', $parts), static function (string $item): bool {
+        return $item !== '';
+    }));
 }
 
 function mteBodyHtml(string $html): string
@@ -446,6 +485,7 @@ if ($seoSectionWasRequested) {
         'berita' => 'Berita, pengumuman, dan agenda Prodi Magister Teknik Elektro UNSOED di Purwokerto, Jawa Tengah.',
         'dokumen' => 'Dokumen akademik Prodi S2 Teknik Elektro UNSOED, termasuk pedoman studi dan informasi Magister Teknik Elektro.',
         'peminatan' => 'Peminatan Magister Teknik Elektro UNSOED: Energi Listrik Cerdas (ELC) dan Teknologi Informasi dan Biomedis (TIB).',
+        'dosen' => 'Daftar dosen Program Studi Magister Teknik Elektro UNSOED beserta bidang riset, metrik sitasi, dan tautan Google Scholar.',
     ];
     $seoDescription = $seoDescriptions[$aktif] ?? $seoDescription;
     if ($aktif === 'berita') {
@@ -559,7 +599,7 @@ if ($seoRequest === 'sitemap.xml') {
         exit;
     }
     $sitemapEntries = [];
-    foreach (['', 'cpl/', 'ppm/', 'kurikulum/', 'berita/', 'dokumen/', 'peminatan/'] as $publicPath) {
+    foreach (['', 'cpl/', 'ppm/', 'kurikulum/', 'peminatan/', 'dosen/', 'berita/', 'dokumen/'] as $publicPath) {
         $sitemapEntries[mteSeoAbsoluteUrl($seoBaseUrl, '/' . $publicPath)] = '';
     }
     foreach ($berita as $article) {
@@ -654,7 +694,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
     <?php endif; ?>
     <link rel="icon" type="image/svg+xml" href="<?= mteEscape($assetPath) ?>/unsoed-favicon.svg?v=1">
     <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/simulasi.css?v=2">
-    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=10">
+    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=12">
 </head>
 <body>
     <a class="skip-link" href="#main">Langsung ke konten</a>
@@ -915,11 +955,63 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                         <p><?= $dokumenDetail !== null ? 'Rincian dokumen dan berkas unduh program studi.' : 'Daftar dokumen program studi, lengkap dengan akses unduh langsung dan halaman detail.' ?></p>
                     <?php elseif ($aktif === 'peminatan'): ?>
                         <p>Gambaran bidang keilmuan yang dapat dipilih mahasiswa program studi.</p>
+                    <?php elseif ($aktif === 'dosen'): ?>
+                        <p>Daftar dosen pengajar beserta bidang riset, metrik sitasi, dan tautan profil Google Scholar.</p>
                     <?php else: ?>
                         <p>Berita, pengumuman, dan agenda program studi dengan filter kategori.</p>
                     <?php endif; ?>
                 </div>
             </div>
+
+            <?php if ($aktif !== 'dosen'): ?>
+            <div class="detail-layout">
+                <aside class="detail-dosen-aside" aria-label="Daftar dosen program studi">
+                    <div class="dosen-aside-head">
+                        <div>
+                            <span class="eyebrow">DOSEN MTE</span>
+                            <h3>Daftar Dosen</h3>
+                        </div>
+                        <a class="dosen-aside-all" href="<?= mteEscape($portalPath . 'dosen/#isi') ?>">Semua <?php mteIcon($assetPath, 'arrow'); ?></a>
+                    </div>
+                    <?php if (!$dosen): ?>
+                        <p class="empty-state">Informasi dosen belum tersedia.</p>
+                    <?php else: ?>
+                        <?php
+                        $dosenAside = $dosen;
+                        shuffle($dosenAside);
+                        $dosenAside = array_slice($dosenAside, 0, 5);
+                        ?>
+                        <ul class="dosen-aside-list" role="list">
+                            <?php foreach ($dosenAside as $item): ?>
+                                <?php $scholarUrl = mteSafeExternalUrl((string) ($item['scholar'] ?? '')); ?>
+                                <li class="dosen-aside-item">
+                                    <?php if ($scholarUrl !== ''): ?>
+                                        <a class="dosen-name-link" href="<?= mteEscape($scholarUrl) ?>" target="_blank" rel="noopener noreferrer">
+                                            <span><?= mteEscape($item['nama']) ?></span>
+                                            <?php mteIcon($assetPath, 'external'); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <strong class="dosen-name-text"><?= mteEscape($item['nama']) ?></strong>
+                                    <?php endif; ?>
+                                    <div class="dosen-cited-tags">
+                                        <span class="dosen-cite-tag is-citations">Cited: <?= (int) $item['citations'] ?></span>
+                                        <span class="dosen-cite-tag">h-index: <?= (int) $item['h_index'] ?></span>
+                                        <span class="dosen-cite-tag">i10-index: <?= (int) $item['i10_index'] ?></span>
+                                    </div>
+                                    <?php $fields = mteDosenFields((string) ($item['bidang'] ?? '')); ?>
+                                    <?php if ($fields): ?>
+                                        <div class="dosen-field-tags">
+                                            <?php foreach ($fields as $field): ?>
+                                                <span class="dosen-field-tag"><?= mteEscape($field) ?></span>
+                                            <?php endforeach; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </aside>
+            <?php endif; ?>
 
             <div class="portal-content">
                     <?php if ($aktif === 'vmts' || $aktif === 'cpl' || $aktif === 'ppm'): ?>
@@ -1024,6 +1116,41 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                                 </article>
                             <?php endforeach; ?>
                         </div>
+                    <?php elseif ($aktif === 'dosen'): ?>
+                        <?php if (!$dosen): ?>
+                            <p class="empty-state">Informasi dosen belum tersedia.</p>
+                        <?php else: ?>
+                            <div class="dosen-directory-grid">
+                                <?php foreach ($dosen as $item): ?>
+                                    <?php $scholarUrl = mteSafeExternalUrl((string) ($item['scholar'] ?? '')); ?>
+                                    <article class="method-card dosen-card">
+                                        <h3>
+                                            <?php if ($scholarUrl !== ''): ?>
+                                                <a class="dosen-name-link" href="<?= mteEscape($scholarUrl) ?>" target="_blank" rel="noopener noreferrer">
+                                                    <span><?= mteEscape($item['nama']) ?></span>
+                                                    <?php mteIcon($assetPath, 'external'); ?>
+                                                </a>
+                                            <?php else: ?>
+                                                <?= mteEscape($item['nama']) ?>
+                                            <?php endif; ?>
+                                        </h3>
+                                        <div class="dosen-cited-tags">
+                                            <span class="dosen-cite-tag is-citations">Cited: <?= (int) $item['citations'] ?></span>
+                                            <span class="dosen-cite-tag">h-index: <?= (int) $item['h_index'] ?></span>
+                                            <span class="dosen-cite-tag">i10-index: <?= (int) $item['i10_index'] ?></span>
+                                        </div>
+                                        <?php $fields = mteDosenFields((string) ($item['bidang'] ?? '')); ?>
+                                        <?php if ($fields): ?>
+                                            <div class="dosen-field-tags">
+                                                <?php foreach ($fields as $field): ?>
+                                                    <span class="dosen-field-tag"><?= mteEscape($field) ?></span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </article>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                     <?php else: ?>
                         <?php if ($beritaDetail !== null): ?>
                             <?php $galeriBeritaTampil = !empty($beritaDetail['galeri_managed']) ? ($beritaDetail['galeri'] ?? []) : ($beritaDetail['id'] === 'seminar-riset' ? $galeriSeminar : []); ?>
@@ -1122,6 +1249,9 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
+            <?php if ($aktif !== 'dosen'): ?>
+            </div>
+            <?php endif; ?>
 
             <section class="portal-links" aria-labelledby="tautan-jurusan">
                 <div class="portal-links-head">

@@ -19,7 +19,7 @@ DirectoryIndex index.php
     RewriteRule ^dokumen/halaman/([1-9][0-9]*)/?$ index.php?bagian=dokumen&halaman=$1 [QSA,L,NC]
     RewriteRule ^dokumen/([a-z0-9-]+)/halaman/([1-9][0-9]*)/?$ index.php?bagian=dokumen&id=$1&halaman=$2 [QSA,L,NC]
     RewriteRule ^dokumen/([a-z0-9-]+)/?$ index.php?bagian=dokumen&id=$1 [QSA,L,NC]
-    RewriteRule ^(vmts|cpl|ppm|kurikulum|dokumen|peminatan)/?$ index.php?bagian=$1 [QSA,L,NC]
+    RewriteRule ^(vmts|cpl|ppm|kurikulum|dokumen|peminatan|dosen)/?$ index.php?bagian=$1 [QSA,L,NC]
 </IfModule>
 
 <FilesMatch "^seed_nov2026\.php$">

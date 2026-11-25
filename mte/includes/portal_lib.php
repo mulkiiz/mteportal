@@ -21,9 +21,10 @@ function mte_portal_sections(): array
         'cpl' => 'CPL Prodi',
         'ppm' => 'PPM Prodi',
         'kurikulum' => 'Kurikulum',
+        'peminatan' => 'Peminatan',
+        'dosen' => 'Dosen',
         'berita' => 'Berita',
         'dokumen' => 'Dokumen',
-        'peminatan' => 'Peminatan',
     ];
 }
 
@@ -213,6 +214,15 @@ function mte_portal_seed_content(): int
         ['dokumen','kalender-akademik','PDF','','',null,'Contoh: Kalender Akademik Program Studi','Contoh ringkasan jadwal penting kegiatan akademik dalam satu periode.','Kalender akademik dapat memuat periode registrasi, perkuliahan, pengajuan penelitian, seminar, dan kegiatan evaluasi. Perbarui isi dan berkas sesuai kalender akademik yang telah ditetapkan.','contoh.pdf',6],
         ['peminatan','energi-listrik-cerdas','','','',null,'Energi Listrik Cerdas (ELC)','','Pendalaman teknologi energi, sistem tenaga, jaringan cerdas, dan integrasi energi berkelanjutan.','',1],
         ['peminatan','teknologi-informasi-biomedis','','','',null,'Teknologi Informasi dan Biomedis (TIB)','','Pendalaman rekayasa teknologi informasi, sistem komputasi, instrumentasi, dan aplikasi biomedis.','',2],
+        ['dosen','arief-sudarmaji','9','8','267',null,'Arief Sudarmaji, Ph.D','Control; Electronics; Instrumentation; Agricultural Engineering','','https://scholar.google.com/citations?user=ooEkh_4AAAAJ&hl=en',1],
+        ['dosen','ari-fadli','15','23','812',null,'Dr. Ir. Ari Fadli, M.Eng.','Machine Learning; Deep Learning; Artificial Intelligence; Information System','','https://scholar.google.com/citations?user=OUDUTj0AAAAJ&hl=id',2],
+        ['dosen','farida-asriani','5','4','96',null,'Dr. Ir. Farida Asriani, M.T.','Image Processing; Computer Vision; Artificial Intelligece & Machine Learning; Intelligent System','','https://scholar.google.com/citations?user=vSLVtycAAAAJ&hl=id',3],
+        ['dosen','hari-siswantoro','4','2','96',null,'Ir. Hari Siswantoro, Ph.D','automated analysis; security; access control; legal compliance','','https://scholar.google.com/citations?user=LZHFkBAAAAAJ&hl=en',4],
+        ['dosen','jamrud-aminuddin','11','12','364',null,'Prof. Dr. Ir. Jamrud Aminuddin','Theoretical and Computational Physics; Atmospheric Remote Sensing','','https://scholar.google.com/citations?user=liJ_0egAAAAJ&hl=en',5],
+        ['dosen','mulki-indana-zulfa','11','12','370',null,'Dr. Ir. Mulki Indana Zulfa, M.T.','information technology; database; data mining; web programming','','https://scholar.google.com/citations?user=TqYM_x4AAAAJ&hl=en',6],
+        ['dosen','retno-supriyanti','13','18','477',null,'Prof. Dr. Eng. Ir. Retno Supriyanti','image processing; artifcial intelligence; telemedicine; sensor and actuator; Renewable Energy','','https://scholar.google.com/citations?user=vUJQJu4AAAAJ&hl=id',7],
+        ['dosen','suroso','10','12','411',null,'Prof. Dr. Eng. Ir. Suroso','Power Electronics; Renewable Energy','','https://scholar.google.com/citations?user=nXhlkmUAAAAJ&hl=id',8],
+        ['dosen','acep-taryana','7','5','157',null,'Dr. Ir. Acep Taryana, M.T.','Software Engineering; Formal Method; Verification System','','https://scholar.google.com/citations?user=EjvohFkAAAAJ&hl=id',9],
     ];
 
     $sql = 'INSERT INTO mte_portal_content (section, slug, kind, label, code, publish_date, title, summary, body, file_name, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -281,6 +291,14 @@ function mte_portal_slug(string $value): string
     $value = strtolower($value);
     $value = preg_replace('/[^a-z0-9]+/', '-', $value) ?? '';
     return trim($value, '-');
+}
+
+function mte_portal_dosen_name_slug(string $fullName): string
+{
+    $nameOnly = preg_replace('/,.*/u', '', trim($fullName)) ?? trim($fullName);
+    $nameOnly = preg_replace('/^(?:(?:Prof|Dr|Drs|Dra|Ir|Eng|H|Hj)\.?\s+)+/iu', '', trim($nameOnly)) ?? trim($nameOnly);
+    $slug = mte_portal_slug($nameOnly);
+    return $slug !== '' ? $slug : mte_portal_slug($fullName);
 }
 
 function mte_portal_text($value, int $max, string $label, bool $required = false): string
@@ -455,16 +473,35 @@ function mte_portal_validate_content(string $section, array $input): array
     if (!array_key_exists($section, mte_portal_sections())) {
         throw new InvalidArgumentException('Menu konten tidak dikenal.');
     }
-    $title = mte_portal_text($input['title'] ?? '', 255, 'Judul', true);
+    $title = mte_portal_text($input['title'] ?? '', 255, $section === 'dosen' ? 'Nama lengkap dan gelar' : 'Judul', true);
     if ($section === 'cpl') {
         $title = function_exists('mb_convert_case')
             ? mb_convert_case($title, MB_CASE_TITLE, 'UTF-8')
             : ucwords(strtolower($title));
     }
-    $code = mte_portal_text($input['code'] ?? '', 30, $section === 'kurikulum' ? 'Kode mata kuliah' : 'Kode', $section === 'kurikulum');
-    $kind = mte_portal_text($input['kind'] ?? '', 40, $section === 'kurikulum' ? 'Kelompok mata kuliah' : 'Jenis', $section === 'kurikulum');
-    $label = mte_portal_text($input['label'] ?? '', 120, $section === 'kurikulum' ? 'Semester' : 'Label', $section === 'kurikulum');
-    $summary = mte_portal_text($input['summary'] ?? '', 5000, 'Ringkasan');
+    $code = mte_portal_text($input['code'] ?? '', 30, $section === 'kurikulum' ? 'Kode mata kuliah' : ($section === 'dosen' ? 'Citations (All)' : 'Kode'), $section === 'kurikulum');
+    $kind = mte_portal_text($input['kind'] ?? '', 40, $section === 'kurikulum' ? 'Kelompok mata kuliah' : ($section === 'dosen' ? 'h-index (All)' : 'Jenis'), $section === 'kurikulum');
+    $label = mte_portal_text($input['label'] ?? '', 120, $section === 'kurikulum' ? 'Semester' : ($section === 'dosen' ? 'i10-index (All)' : 'Label'), $section === 'kurikulum');
+    $summary = mte_portal_text($input['summary'] ?? '', 5000, $section === 'dosen' ? 'Bidang riset' : 'Ringkasan');
+    $fileName = '';
+    if ($section === 'dosen') {
+        $scholarUrl = mte_portal_text($input['file_name'] ?? '', 255, 'URL Google Scholar', true);
+        if (!preg_match('#^https?://#i', $scholarUrl) || filter_var($scholarUrl, FILTER_VALIDATE_URL) === false) {
+            throw new InvalidArgumentException('URL Google Scholar harus berupa tautan http:// atau https:// yang valid.');
+        }
+        $fileName = $scholarUrl;
+        $code = $code === '' ? '0' : $code;
+        $kind = $kind === '' ? '0' : $kind;
+        $label = $label === '' ? '0' : $label;
+        foreach (['Citations (All)' => $code, 'h-index (All)' => $kind, 'i10-index (All)' => $label] as $metricLabel => $metricValue) {
+            if (!preg_match('/^\d{1,10}$/D', $metricValue)) {
+                throw new InvalidArgumentException($metricLabel . ' harus berupa angka bulat tidak negatif.');
+            }
+        }
+        $code = (string) (int) $code;
+        $kind = (string) (int) $kind;
+        $label = (string) (int) $label;
+    }
     if ($section === 'kurikulum') {
         if (!preg_match('/^[A-Za-z0-9][A-Za-z0-9._-]{1,29}$/D', $code)) {
             throw new InvalidArgumentException('Kode mata kuliah hanya boleh berisi huruf, angka, titik, garis bawah, atau tanda hubung.');
@@ -480,7 +517,13 @@ function mte_portal_validate_content(string $section, array $input): array
     }
     $slug = mte_portal_slug(mte_portal_text($input['slug'] ?? '', 140, 'Alamat konten'));
     if ($slug === '') {
-        $slug = mte_portal_slug($section === 'kurikulum' ? $code : $title);
+        if ($section === 'kurikulum') {
+            $slug = mte_portal_slug($code);
+        } elseif ($section === 'dosen') {
+            $slug = mte_portal_dosen_name_slug($title);
+        } else {
+            $slug = mte_portal_slug($title);
+        }
     }
     if (!preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/D', $slug)) {
         throw new InvalidArgumentException('Alamat konten harus terdiri dari huruf kecil, angka, dan tanda hubung.');
@@ -512,7 +555,10 @@ function mte_portal_validate_content(string $section, array $input): array
         'publish_date' => $date,
         'title' => $title,
         'summary' => $summary,
-        'body' => mte_portal_sanitize_html(mte_portal_text($input['body'] ?? '', 30000, 'Detail'), true),
+        'file_name' => $fileName,
+        'body' => ($section === 'kurikulum' || $section === 'dosen')
+            ? ''
+            : mte_portal_sanitize_html(mte_portal_text($input['body'] ?? '', 30000, 'Detail'), true),
         'sort_order' => (int) $orderRaw,
         'is_active' => isset($input['is_active']) && (string) $input['is_active'] === '1' ? 1 : 0,
     ];
@@ -525,7 +571,9 @@ function mte_portal_save_content(string $section, int $id, array $input, ?string
     if ($id > 0 && (!$existing || $existing['section'] !== $section)) {
         throw new InvalidArgumentException('Konten yang akan diubah tidak ditemukan.');
     }
-    $fileName = $section === 'dokumen' ? (string) ($uploadedFile ?? ($existing['file_name'] ?? '')) : '';
+    $fileName = $section === 'dokumen'
+        ? (string) ($uploadedFile ?? ($existing['file_name'] ?? ''))
+        : ($section === 'dosen' ? $data['file_name'] : '');
     if ($section === 'dokumen' && $fileName === '') {
         throw new InvalidArgumentException('Unggah berkas PDF untuk dokumen baru.');
     }
