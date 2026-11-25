@@ -231,7 +231,7 @@ function mteAdminBrand(string $subtitle): void
 
 function mteIcon(string $assetPath, string $name): void
 {
-    $iconHref = mteEscape($assetPath . '/portal-icons.svg?v=2#' . rawurlencode($name));
+    $iconHref = mteEscape($assetPath . '/portal-icons.svg?v=3#' . rawurlencode($name));
     ?>
     <svg class="ui-icon" width="18" height="18" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><use href="<?= $iconHref ?>"/></svg>
     <?php
@@ -694,7 +694,7 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
     <?php endif; ?>
     <link rel="icon" type="image/svg+xml" href="<?= mteEscape($assetPath) ?>/unsoed-favicon.svg?v=1">
     <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/simulasi.css?v=2">
-    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=12">
+    <link rel="stylesheet" href="<?= mteEscape($assetPath) ?>/mte-portal.css?v=20">
 </head>
 <body>
     <a class="skip-link" href="#main">Langsung ke konten</a>
@@ -1273,36 +1273,59 @@ header("Content-Security-Policy: default-src 'none'; img-src 'self' data:; scrip
 
         <footer class="page-footer">
             <div class="footer-grid">
-                <div class="footer-brand">
+                <div class="footer-logo">
                     <a class="brand" href="<?= mteEscape($portalPath) ?>">
                         <span class="brand-mark">MTE</span>
                         <div><strong>Magister Teknik Elektro</strong><span>Jurusan Teknik Elektro</span></div>
                     </a>
-                    <p>Jln. Mayjen Sungkono Km.5 Kec. Kalimanah Kab.Purbalingga</p>
+                    <p class="footer-address">Jln. Mayjen Sungkono Km.5 Kec. Kalimanah, Kab. Purbalingga</p>
                 </div>
-                <nav class="footer-col" aria-label="Tautan portal">
-                    <span class="footer-title">PORTAL</span>
-                    <?php foreach ($bagian as $kode => $info): ?>
-                        <a href="<?= mteEscape($portalPath . rawurlencode($kode)) ?>/#isi"><?= mteEscape($info[1]) ?></a>
-                    <?php endforeach; ?>
-                </nav>
-                <nav class="footer-col" aria-label="Tautan jurusan">
-                    <span class="footer-title">JURUSAN</span>
-                    <?php foreach ($tautanJurusan as [$icon, $fragment, $label]): ?>
-                        <a href="<?= mteEscape($situsJurusan . $fragment) ?>" target="_blank" rel="noopener noreferrer"><?= mteEscape($label) ?></a>
-                    <?php endforeach; ?>
-                </nav>
-                <nav class="footer-col" aria-label="Situs resmi">
-                    <span class="footer-title">SITUS RESMI</span>
-                    <a href="<?= mteEscape($situsFakultas) ?>">Fakultas Teknik</a>
-                    <a href="<?= mteEscape($situsUnsoed) ?>">Universitas Jenderal Soedirman</a>
-                </nav>
-            </div>
-            <div class="footer-bottom">
-                <span>© 2026 Jurusan Teknik Elektro UNSOED. Seluruh hak cipta dilindungi.</span>
-                <span>Fakultas Teknik · Universitas Jenderal Soedirman</span>
+                <div class="footer-links-pair">
+                    <nav class="footer-col" aria-label="Tautan portal">
+                        <span class="footer-title">PORTAL</span>
+                        <ul class="footer-link-list">
+                            <?php foreach (['vmts', 'cpl', 'ppm', 'peminatan'] as $kode): ?>
+                                <?php if (isset($bagian[$kode])): ?>
+                                    <li><a href="<?= mteEscape($portalPath . rawurlencode($kode)) ?>/#isi"><?= mteEscape($bagian[$kode][1]) ?></a></li>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </ul>
+                    </nav>
+                    <nav class="footer-col" aria-label="Tautan jurusan">
+                        <span class="footer-title">JURUSAN</span>
+                        <ul class="footer-link-list">
+                            <?php foreach ($tautanJurusan as [$icon, $fragment, $label]): ?>
+                                <li><a href="<?= mteEscape($situsJurusan . $fragment) ?>" target="_blank" rel="noopener noreferrer"><?= mteEscape($label) ?></a></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="footer-location">
+                    <span class="footer-title">LOKASI &amp; KONTAK</span>
+                    <p>Jln. Mayjen Sungkono Km.5, Blater, Kalimanah, Kab. Purbalingga — Fakultas Teknik UNSOED.</p>
+                    <div class="footer-contact-actions">
+                        <a class="footer-contact-pill" href="mailto:mte@unsoed.ac.id">
+                            <?php mteIcon($assetPath, 'mail'); ?>
+                            <span>mte@unsoed.ac.id</span>
+                        </a>
+                        <a class="footer-contact-pill" href="https://maps.app.goo.gl/N1nw25njo52pv9v96" target="_blank" rel="noopener noreferrer">
+                            <?php mteIcon($assetPath, 'map-pin'); ?>
+                            <span>Buka Maps FT</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </footer>
+        <div class="page-copyright">
+            <span>© 2026 Jurusan Teknik Elektro UNSOED. Seluruh hak cipta dilindungi.</span>
+            <span>Fakultas Teknik · Universitas Jenderal Soedirman</span>
+        </div>
     </main>
+
+    <a class="floating-admisi-cta" href="https://pasca.admisi.unsoed.ac.id/" target="_blank" rel="noopener noreferrer" aria-label="Bergabunglah Bersama Kami - SPMB Pascasarjana UNSOED">
+        <span class="floating-admisi-dot" aria-hidden="true"></span>
+        <span>Bergabunglah Bersama Kami</span>
+        <?php mteIcon($assetPath, 'arrow'); ?>
+    </a>
 </body>
 </html>
